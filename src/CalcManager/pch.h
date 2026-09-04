@@ -11,16 +11,24 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <intsafe.h>
+#include <functional>
 #include <list>
-#include <ppltasks.h>
+#include <memory>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
-#include <winerror.h>
 #include <iostream>
 #include <cmath>
 #include <random>
 #include <iomanip>
+
+#if defined(_WIN32)
+#include <intsafe.h>
+#include <ppltasks.h>
+#include <winerror.h>
+#else
+#include "winerror_cross_platform.h"
+#endif

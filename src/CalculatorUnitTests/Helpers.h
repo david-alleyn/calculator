@@ -18,6 +18,11 @@ namespace CalculatorUnitTests
     }
 }
 
+// Each of these helpers is only defined when the test framework header did not
+// already provide an equivalent. The Visual Studio framework defines several
+// VERIFY_* macros, and the Linux port defines its own set in CppUnitTest.h;
+// either way the framework implementation takes precedence.
+#ifndef VERIFY_THROWS_EXPECTEDEXCEPTION
 #define VERIFY_THROWS_EXPECTEDEXCEPTION(__operation, __exception)                                                                                              \
     {                                                                                                                                                          \
         bool __exceptionHit = false;                                                                                                                           \
@@ -35,57 +40,79 @@ namespace CalculatorUnitTests
             Assert::Fail(L"Expected exception was not caught");                                                                                                \
         }                                                                                                                                                      \
     }
+#endif
 
+#ifndef VERIFY_IS_NULL
 #define VERIFY_IS_NULL(__operation, ...)                                                                                                                       \
     {                                                                                                                                                          \
         Assert::IsTrue(nullptr == __operation, __VA_ARGS__);                                                                                                   \
     }
+#endif
 
+#ifndef VERIFY_IS_NOT_NULL
 #define VERIFY_IS_NOT_NULL(__operation, ...)                                                                                                                   \
     {                                                                                                                                                          \
         Assert::IsTrue(nullptr != __operation, __VA_ARGS__);                                                                                                   \
     }
+#endif
 
+#ifndef VERIFY_IS_LESS_THAN
 #define VERIFY_IS_LESS_THAN(__expectedLess, __expectedGreater, ...)                                                                                            \
     {                                                                                                                                                          \
         Assert::IsTrue(__expectedLess < __expectedGreater, __VA_ARGS__);                                                                                       \
     }
+#endif
 
+#ifndef VERIFY_IS_GREATER_THAN
 #define VERIFY_IS_GREATER_THAN(__expectedGreater, __expectedLess, ...)                                                                                         \
     {                                                                                                                                                          \
         Assert::IsTrue(__expectedGreater > __expectedLess, __VA_ARGS__);                                                                                       \
     }
+#endif
 
+#ifndef VERIFY_ARE_EQUAL
 #define VERIFY_ARE_EQUAL(__f1, __f2, ...)                                                                                                                      \
     {                                                                                                                                                          \
         Assert::IsTrue(__f1 == __f2, __VA_ARGS__);                                                                                                             \
     }
+#endif
 
+#ifndef VERIFY_ARE_NOT_EQUAL
 #define VERIFY_ARE_NOT_EQUAL(__f1, __f2, ...)                                                                                                                  \
     {                                                                                                                                                          \
         Assert::IsTrue(__f1 != __f2, __VA_ARGS__);                                                                                                             \
     }
+#endif
 
+#ifndef VERIFY_IS_TRUE
 #define VERIFY_IS_TRUE(__operation, ...)                                                                                                                       \
     {                                                                                                                                                          \
         Assert::IsTrue(__operation, __VA_ARGS__);                                                                                                              \
     }
+#endif
 
+#ifndef VERIFY_IS_FALSE
 #define VERIFY_IS_FALSE(__operation, ...)                                                                                                                      \
     {                                                                                                                                                          \
         Assert::IsFalse(__operation, __VA_ARGS__);                                                                                                             \
     }
+#endif
 
+#ifndef VERIFY_IS_LESS_THAN_OR_EQUAL
 #define VERIFY_IS_LESS_THAN_OR_EQUAL(__expectedLess, __expectedGreater, ...)                                                                                   \
     {                                                                                                                                                          \
         Assert::IsTrue(__expectedLess <= __expectedGreater, __VA_ARGS__);                                                                                      \
     }
+#endif
 
+#ifndef VERIFY_IS_GREATER_THAN_OR_EQUAL
 #define VERIFY_IS_GREATER_THAN_OR_EQUAL(__expectedGreater, __expectedLess, ...)                                                                                \
     {                                                                                                                                                          \
         Assert::IsTrue(__expectedGreater >= __expectedLess, __VA_ARGS__);                                                                                      \
     }
+#endif
 
+#if defined(_WIN32)
 template <typename T>
 void VERIFY_VECTORS_ARE_EQUAL(Windows::Foundation::Collections::IVector<T> ^ vecA, Windows::Foundation::Collections::IVector<T> ^ vecB, ...)
 {
@@ -97,3 +124,4 @@ void VERIFY_VECTORS_ARE_EQUAL(Windows::Foundation::Collections::IVector<T> ^ vec
         VERIFY_ARE_EQUAL(vecA->GetAt(i), vecB->GetAt(i), __VA_ARGS__);
     }
 };
+#endif

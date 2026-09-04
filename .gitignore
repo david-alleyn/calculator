@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# CMake build trees (Linux port)
+build/cmake/
+CMakeUserPresets.json
+
 # User-specific files
 *.suo
 *.user

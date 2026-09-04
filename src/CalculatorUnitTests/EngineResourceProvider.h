@@ -5,6 +5,10 @@
 
 #include "CalcManager/CalculatorResource.h"
 
+#if defined(_WIN32)
+#include <winrt/Windows.ApplicationModel.Resources.h>
+#endif
+
 namespace CalculatorApp::ViewModel::Common
 {
     // Minimal engine resource provider for the native CalcManager unit tests.
@@ -18,6 +22,8 @@ namespace CalculatorApp::ViewModel::Common
         std::wstring GetCEngineString(std::wstring_view id) override;
 
     private:
-        Windows::ApplicationModel::Resources::ResourceLoader ^ m_resLoader;
+#if defined(_WIN32)
+        winrt::Windows::ApplicationModel::Resources::ResourceLoader m_resLoader = nullptr;
+#endif
     };
 }

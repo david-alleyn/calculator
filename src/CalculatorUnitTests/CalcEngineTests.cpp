@@ -18,6 +18,7 @@ namespace CalculatorEngineTests
 {
     TEST_CLASS(CalcEngineTests)
     {
+    public:
         TEST_METHOD_INITIALIZE(CommonSetup)
         {
             m_resourceProvider = make_shared<EngineResourceProvider>();

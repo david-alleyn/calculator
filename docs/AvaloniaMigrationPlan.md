@@ -4,7 +4,10 @@ This document describes the plan to migrate Windows Calculator from its current 
 [AvaloniaUI](https://avaloniaui.net/) so that it can run on Linux. It also covers
 the platform-neutralization work required in the ViewModel and native engine layers.
 
-**Status:** draft. Decision points are called out in [Open decisions](#open-decisions).
+**Status:** Phase 0 (feasibility spike) complete — engine builds and passes tests on Linux
+via CMake/ctest, a C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0
+through source-generated P/Invoke, and an Avalonia 12 demo window evaluates expressions with the
+native engine. Key decisions are recorded in [Decisions](#decisions).
 
 ---
 
@@ -27,14 +30,13 @@ the platform-neutralization work required in the ViewModel and native engine lay
 - [Risks](#risks)
 - [Rollout and compatibility](#rollout-and-compatibility)
 - [Effort estimate](#effort-estimate)
-- [Open decisions](#open-decisions)
+- [Decisions](#decisions)
 
 ---
 
 ## Motivation
 
-- Run the calculator on Linux (and, almost for free, macOS) while preserving bit-identical
-  calculation results.
+- Run the calculator on Linux while preserving bit-identical calculation results.
 - Unlock new contributors who do not develop on Windows.
 - Reduce dependence on UWP-specific tooling (MSIX packaging, PRI resources, WinAppDriver UI tests,
   app-environment dependencies).
@@ -49,24 +51,24 @@ the platform-neutralization work required in the ViewModel and native engine lay
 | Interop | `src/CalcManager.Interop` | WinRT projection of the C++ engine for C# | Replace with C ABI + P/Invoke |
 | Graphing | `src/GraphingImpl` (C++ evaluator) + `src/GraphControl` (UWP XAML C++ control) | WinRT | Keep evaluator; rewrite control as Avalonia SkiaSharp control |
 | Tests | `src/Calculator.Tests` (C#), `src/CalculatorUnitTests` (C++), `src/CalculatorUITests` (WinAppDriver) | — | xUnit, ctest, Avalonia.Headless |
-| Packaging / CI | MSIX bundle, Azure Pipelines, Windows-hosted runners | — | Flatpak / AppImage / deb, GitHub Actions on `ubuntu-latest` |
+| Packaging / CI | MSIX bundle, Azure Pipelines, Windows-hosted runners | — | Flatpak / AUR, GitHub Actions on `ubuntu-latest` |
 
 ## Target architecture
 
 ```
-src/Calculator.Avalonia          Avalonia 11, net8.0 (View, see detailed UI port mapping)
-src/Calculator.ViewModels        net8.0 class library (CommunityToolkit.Mvvm)
-src/Calculator.ViewModels.Tests  xUnit on net8.0
+src/Calculator.Avalonia          Avalonia 12, net10.0 (View, see detailed UI port mapping)
+src/Calculator.ViewModels        net10.0 class library (CommunityToolkit.Mvvm)
+src/Calculator.ViewModels.Tests  xUnit on net10.0
 src/CalcManager                  C++ (unchanged engine), CMake build on Linux + Windows
 src/CalcManager.Interop          thin C API shim exposing the engine to P/Invoke
 src/GraphingImpl                 C++ evaluator (unchanged), exposed through the same C API
 src/PlotControl                  Avalonia control rendering plots via SkiaSharp
 build/pipelines/*.yaml           GitHub Actions workflows for linux CI (engine + dotnet)
-packaging/                       Flatpak manifest, AppImage, deb metadata
+packaging/                       Flatpak manifest + AUR PKGBUILD metadata; AppImage optional
 ```
 
-Cross-platform targets for Avalonia: Windows, Linux, macOS (decided in
-[Open decisions](#open-decisions)).
+Target platform: Linux only. The UWP app remains the Windows product (see
+[Decisions](#decisions)).
 
 ## Strategy
 
@@ -84,7 +86,7 @@ Cross-platform targets for Avalonia: Windows, Linux, macOS (decided in
 
 ## Platform API replacement guide
 
-| Windows / UWP API (`Windows.*`) | .NET 8 replacement |
+| Windows / UWP API (`Windows.*`) | .NET 10 replacement |
 |---|---|
 | `Windows.Storage.ApplicationData` | abstraction over `$XDG_DATA_HOME` / `$XDG_CONFIG_HOME`, `System.IO` |
 | `Windows.ApplicationModel.Resources.ResourceLoader` (.resw) | .resx resources + `ResourceManager`; resw→resx conversion tooling for ~80 locales |
@@ -121,7 +123,7 @@ Cross-platform targets for Avalonia: Windows, Linux, macOS (decided in
 *Goal: prove the riskiest assumptions in days, not months.*
 
 - Build `CalcManager` on Linux with Clang + CMake; run `RationalTest` / `CalcEngineTests` via ctest.
-- Define the initial C API surface for the engine; call it from a net8.0 console app via P/Invoke
+- Define the initial C API surface for the engine; call it from a net10.0 console app via P/Invoke
   to validate string/memory marshalling.
 - Prototype one Avalonia window that displays a calculator expression evaluated by the native
   engine.
@@ -129,24 +131,39 @@ Cross-platform targets for Avalonia: Windows, Linux, macOS (decided in
 **Exit criteria:** all C++ engine tests pass on Linux; a P/Invoke round trip succeeds; a demo
 Avalonia app runs on Ubuntu.
 
+**Progress (complete):**
+- `CMakeLists.txt` (root) + `src/CalcManager/CMakeLists.txt` build the engine with Clang; the
+  UWP-only precum headers were made portable (`pch.h`, `winerror_cross_platform.h`,
+  `sal_cross_platform.h`, guarded `UnitConverter.h`).
+- `tests/NativeTests` runs the existing `RationalTest` and `CalcEngineTests` verbatim through a
+  portable `CppUnitTest.h` shim: 12/12 passing via ctest.
+- `src/CalcManager.Interop/calc_api.h/.cpp` exposes the first C ABI slice (session create/destroy,
+  send command, primary/expression display, error state, history, parentheses).
+- `tests/InteropSmoke` (net10.0 console, `LibraryImport`) verifies marshalling and end-to-end
+  evaluation (1 + 2 = 3, divide-by-zero error state, 3 ^ 2 = 9). Lesson: string getters return
+  engine-owned buffers; do not marshal returns as `LPUTF8Str` (marshaller frees them).
+- `tests/InteropDemo` is an Avalonia 12 desktop window with a working keypad driving the engine;
+  `EngineDemoLaunches` keeps it alive under the test runner when a DISPLAY is available.
+- Engine string catalog: `CEngineStrings.resw` (en-US) is loaded at runtime
+  (`CALC_ENGINE_STRINGS_RESW`) by a minimal resw parser in the shim.
+
 ### Phase 1 - De-Windows the ViewModels
 
 *Largest mechanical effort; delivers testable logic on Linux.*
 
-- Retarget `Calculator.ViewModels` to a net8.0 class library.
+- Retarget `Calculator.ViewModels` to a net10.0 class library.
 - Replace every `Windows.*` dependency listed in the
   [Platform API replacement guide](#platform-api-replacement-guide), behind thin abstractions
   where multiple implementations exist (storage, clipboard, dispatcher, telemetry).
-- Convert engine resource strings from `.resw` to `.resx` (or a runtime JSON equivalent that the
-  native engine can also load).
+- Convert engine resource strings from `.resw` to `.resx` and load them via `ResourceManager`.
 - Retire `CalcManager.Interop` in favor of the C ABI shim.
-- Port `Calculator.Tests` to xUnit on net8.0; keep every existing test green before touching UI.
+- Port `Calculator.Tests` to xUnit on net10.0; keep every existing test green before touching UI.
 
 **Exit criteria:** `dotnet test` passes on Linux for the full ViewModel suite.
 
 ### Phase 2 - App shell and Standard mode
 
-- Scaffold `src/Calculator.Avalonia` (Avalonia 11, net8.0, `App.axaml` + `MainWindow`).
+- Scaffold `src/Calculator.Avalonia` (Avalonia 12, net10.0, `App.axaml` + `MainWindow`).
 - Implement window chrome, mode navigation, and the history/memory panel with its
   flyout↔docked resize behavior.
 - Port the Standard calculator view end-to-end: display, number pad, operators, history, and
@@ -178,14 +195,16 @@ interaction frame rates on a mid-range Linux desktop.
 ### Phase 5 - Platform tooling and packaging
 
 - GitHub Actions on `ubuntu-latest`: engine CMake + ctest pipeline and `dotnet build/test`
-  pipeline; keep existing Windows CI until cutover.
-- Distribution: Flatpak manifest, AppImage, and deb packaging with desktop entry and icons.
+  pipeline; keep existing Windows CI as long as the UWP app ships.
+- Distribution: Flatpak manifest and Arch User Repository (AUR) packaging with desktop entry and
+  icons; AppImage optional later.
 - Localization pipeline for the converted resx catalogs; RTL (Hebrew/Arabic) verification on
   Linux.
 
 ### Phase 6 - Cutover
 
-- Archive the UWP `Calculator` project, `CalculatorUITests`, appx manifests, and MSIX pipelines.
+- Retain the UWP `Calculator` project, `CalculatorUITests`, appx manifests, and MSIX pipelines as
+  the Windows product; the Avalonia stack ships for Linux only.
 - Update [ApplicationArchitecture.md](ApplicationArchitecture.md), README, and contributing docs
   with the new project layout and Linux build instructions.
 
@@ -206,8 +225,8 @@ interaction frame rates on a mid-range Linux desktop.
 
 ## Rollout and compatibility
 
-- The legacy UWP app remains the shipping Windows product until Phase 6 cutover criteria are met
-  on the new stack.
+- The legacy UWP app remains the shipping Windows product; the Avalonia stack targets Linux only
+  (see [Decisions](#decisions)).
 - Differential testing: run the C# ViewModel suite against both engine builds (native Windows and
   native Linux) during the migration window.
 
@@ -228,13 +247,10 @@ Figures assume a small team with one native-engine expert.
 **Total: roughly 6 person-months for full parity.** Phase 1-2 alone yields a runnable
 Standard/Scientific Linux app much earlier and is a natural first milestone.
 
-## Open decisions
+## Decisions
 
-1. **Target OS set:** Linux-only first, or Windows + macOS from day one (recommended: target all
-   three; cost is low once UWP-specific dependencies are removed)?
-2. **Native engine strategy:** keep C++ CalcManager (recommended) vs. a full C# port of the RatPack
-   engine?
-3. **Graphing in v1:** ship core modes first and graphing in a follow-up release (recommended)?
-4. **Localization storage:** migrate resw to resx, or adopt a runtime JSON resource scheme shared
-   by C# and native code?
-5. **Distribution channels:** Flatpak only, or AppImage + deb as well?
+1. **Target OS set:** Linux only. The UWP app remains the Windows product.
+2. **Native engine strategy:** keep the C++ CalcManager engine; no C# port of RatPack.
+3. **Graphing in v1:** ship core modes first; graphing ships in a follow-up release.
+4. **Localization storage:** migrate resw to resx and use `ResourceManager`.
+5. **Distribution channels:** Flatpak + Arch User Repository (AUR); AppImage optional later.
