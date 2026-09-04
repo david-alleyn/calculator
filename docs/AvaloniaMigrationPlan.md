@@ -25,8 +25,8 @@ alongside the UWP project and the full test suite passes on Linux against the li
   - [Phase 0 - Feasibility spike](#phase-0---feasibility-spike)
   - [Phase 1 - De-Windows the ViewModels](#phase-1---de-windows-the-viewmodels)
   - [Phase 2 - App shell and Standard mode](#phase-2---app-shell-and-standard-mode)
-  - [Phase 3 - Remaining modes](#phase-3---remaining-modes)
-  - [Phase 4 - Graphing](#phase-4---graphing)
+  - [Phase 3 - Remaining modes (optional)](#phase-3---remaining-modes-optional)
+  - [Phase 4 - Graphing (optional)](#phase-4---graphing-optional)
   - [Phase 5 - Platform tooling and packaging](#phase-5---platform-tooling-and-packaging)
   - [Phase 6 - Cutover](#phase-6---cutover)
 - [Risks](#risks)
@@ -200,7 +200,10 @@ Avalonia app runs on Ubuntu.
 **Exit criteria:** Standard mode at visual/behavioral parity on Linux, driven by the existing
 `StandardCalculatorViewModel`.
 
-### Phase 3 - Remaining modes
+### Phase 3 - Remaining modes (optional)
+
+*Optional: the app is fully usable with Standard mode; this phase extends coverage to every
+non-graphing mode.*
 
 - Scientific (including Shift/inverse button collapse states), Programmer (bit-flip and radix
   panels), Date calculation, and Unit Converter (all categories + live currency).
@@ -208,9 +211,9 @@ Avalonia app runs on Ubuntu.
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.
 
-### Phase 4 - Graphing
+### Phase 4 - Graphing (optional)
 
-*Highest-risk phase; the current graphing UI is a native UWP C++ control.*
+*Optional; also the highest-risk phase. The current graphing UI is a native UWP C++ control.*
 
 - Keep the C++ `GraphingImpl` evaluator behind the C ABI.
 - Implement `PlotControl` (SkiaSharp): grid/axes, pan, zoom, trace, key graph features.
