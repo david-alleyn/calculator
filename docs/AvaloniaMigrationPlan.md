@@ -4,10 +4,12 @@ This document describes the plan to migrate Windows Calculator from its current 
 [AvaloniaUI](https://avaloniaui.net/) so that it can run on Linux. It also covers
 the platform-neutralization work required in the ViewModel and native engine layers.
 
-**Status:** Phase 0 (feasibility spike) complete — engine builds and passes tests on Linux
-via CMake/ctest, a C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0
-through source-generated P/Invoke, and an Avalonia 12 demo window evaluates expressions with the
-native engine. Key decisions are recorded in [Decisions](#decisions).
+**Status:** Phases 0-1 complete — the engine builds and passes its tests on Linux via
+CMake/ctest, the C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0
+through source-generated P/Invoke, an Avalonia 12 demo window evaluates expressions with the
+native engine (Phase 0), and the ViewModels have been de-Windowed: they build for net10.0
+alongside the UWP project and the full test suite passes on Linux against the live native engine
+(Phase 1, 294/294 tests). Key decisions are recorded in [Decisions](#decisions).
 
 ---
 
