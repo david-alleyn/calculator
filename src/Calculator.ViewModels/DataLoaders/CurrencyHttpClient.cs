@@ -12,9 +12,9 @@ namespace CalculatorApp.ViewModel.DataLoaders
         public static bool ForceWebFailure = false;
 #endif
 
-        // Keep HttpClient field to ensure Windows.Web.Http assembly is referenced
-        // (required for .NET Native AOT compilation stability).
-        private static readonly Windows.Web.Http.HttpClient _sharedClient = new Windows.Web.Http.HttpClient();
+        // Keep HttpClient field to ensure the HTTP assembly is referenced
+        // (required for .NET Native AOT compilation stability on Windows).
+        private static readonly System.Net.Http.HttpClient _sharedClient = new System.Net.Http.HttpClient();
         private string _responseLanguage;
 
         // Mock data matching the C++ open-source calculator behavior (fictional planet currencies).

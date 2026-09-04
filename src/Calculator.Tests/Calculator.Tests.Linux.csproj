@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Linux / cross-platform test project. Compiles the same test sources as
+    src/Calculator.Tests (MSTest) against the net10.0 ViewModels and the native
+    engine C ABI. The native library path is resolved through the
+    CALCULATOR_NATIVE_LIB environment variable (set by the CMake test driver or
+    by the developer when running dotnet test directly).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Calculator.Tests</AssemblyName>
+    <LangVersion>13.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Calculator.Tests\*.cs" Exclude="..\Calculator.Tests\UnitTestApp.xaml.cs" Link="Tests/%(Filename)%(Extension)" />
+    <Compile Include="Platform/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.6.4" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.6.4" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Calculator.ViewModels\Calculator.ViewModels.Linux.csproj" />
+  </ItemGroup>
+
+</Project>

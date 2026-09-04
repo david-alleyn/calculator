@@ -7,7 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+#if WINDOWS_UWP
 using Windows.ApplicationModel.DataTransfer;
+#endif
 
 namespace CalculatorApp.ViewModel.Common
 {
@@ -104,9 +106,13 @@ namespace CalculatorApp.ViewModel.Common
 
         public static void CopyToClipboard(string stringToCopy)
         {
+#if WINDOWS_UWP
             var dataPackage = new DataPackage();
             dataPackage.SetText(stringToCopy);
             Clipboard.SetContentWithOptions(dataPackage, null);
+#else
+            LinuxClipboard.SetText(stringToCopy);
+#endif
         }
 
         public static async Task<string> GetStringToPaste(
@@ -115,14 +121,22 @@ namespace CalculatorApp.ViewModel.Common
             NumberBase programmerNumberBase,
             BitLength bitLengthType)
         {
+#if WINDOWS_UWP
             var dataPackageView = Clipboard.GetContent();
             string pastedText = await dataPackageView.GetTextAsync(StandardDataFormats.Text);
+#else
+            string pastedText = LinuxClipboard.GetText();
+#endif
             return ValidatePasteExpression(pastedText, mode, modeType, programmerNumberBase, bitLengthType);
         }
 
         public static bool HasStringToPaste()
         {
+#if WINDOWS_UWP
             return Clipboard.GetContent().Contains(StandardDataFormats.Text);
+#else
+            return !string.IsNullOrEmpty(LinuxClipboard.GetText());
+#endif
         }
 
         public static bool IsErrorMessage(string message)

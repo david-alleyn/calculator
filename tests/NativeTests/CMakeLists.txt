@@ -32,6 +32,18 @@ if(DOTNET_EXECUTABLE)
     )
     set_tests_properties(EngineInteropDotNetSmoke PROPERTIES TIMEOUT 600)
 
+    # Runs the ported ViewModel test suite (net10.0 / MSTest) against the live
+    # native engine through the C ABI.
+    add_test(
+        NAME CalculatorViewModelsDotNetTests
+        COMMAND ${CMAKE_COMMAND} -E env
+                LD_LIBRARY_PATH=$<TARGET_FILE_DIR:CalculatorNative>
+                CALCULATOR_NATIVE_LIB=$<TARGET_FILE_DIR:CalculatorNative>/libCalculatorNative.so
+                CALCULATOR_RESOURCES_DIR=${CMAKE_SOURCE_DIR}/src/Calculator/Resources
+                ${DOTNET_EXECUTABLE} test ${CMAKE_SOURCE_DIR}/src/Calculator.Tests/Calculator.Tests.Linux.csproj -c Release
+    )
+    set_tests_properties(CalculatorViewModelsDotNetTests PROPERTIES TIMEOUT 900)
+
     # Launches the Avalonia demo and keeps it alive for a few seconds to prove
     # the UI stack can start against the native engine. Only runs when a DISPLAY
     # is available, so headless CI skips it (the interop smoke covers logic).

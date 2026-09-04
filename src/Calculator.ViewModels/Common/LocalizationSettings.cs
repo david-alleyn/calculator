@@ -9,7 +9,6 @@ using System.Text;
 using Windows.Globalization;
 using Windows.Globalization.DateTimeFormatting;
 using Windows.Globalization.NumberFormatting;
-using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
@@ -212,6 +211,7 @@ namespace CalculatorApp.ViewModel.Common
 
         public bool IsRtlLayout()
         {
+#if WINDOWS_UWP
             try
             {
                 var flowDirection = Windows.ApplicationModel.Resources.Core.ResourceContext.GetForCurrentView()
@@ -222,6 +222,16 @@ namespace CalculatorApp.ViewModel.Common
             {
                 return false;
             }
+#else
+            try
+            {
+                return System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+            }
+            catch
+            {
+                return false;
+            }
+#endif
         }
 
         private static Dictionary<string, string> s_tokenToReadableNameMap;
@@ -398,6 +408,7 @@ namespace CalculatorApp.ViewModel.Common
 
         private void Initialize(DecimalFormatter formatter)
         {
+#if WINDOWS_UWP
             formatter.FractionDigits = 0;
             formatter.IsDecimalPointAlwaysDisplayed = false;
 
@@ -485,6 +496,32 @@ namespace CalculatorApp.ViewModel.Common
             // LOCALE_IFIRSTDAYOFWEEK: 0=Monday ... 6=Sunday
             // Windows.Globalization.DayOfWeek: 0=Sunday, 1=Monday ... 6=Saturday
             _firstDayOfWeek = (Windows.Globalization.DayOfWeek)((dayValue + 1) % 7);
+#else
+            // Linux: derive the same data from the culture the formatter resolved.
+            var currentCulture = formatter.ResolvedCulture;
+            var numberFormat = formatter.NumberFormat;
+
+            _resolvedName = string.IsNullOrEmpty(currentCulture.Name) ? "en-US" : currentCulture.Name;
+
+            for (int i = 0; i < 10; i++)
+            {
+                string[] nativeDigits = numberFormat.NativeDigits;
+                _digitSymbols[i] = nativeDigits != null && nativeDigits.Length == 10 ? nativeDigits[i][0] : (char)('0' + i);
+            }
+
+            _decimalSeparator = string.IsNullOrEmpty(numberFormat.NumberDecimalSeparator) ? '.' : numberFormat.NumberDecimalSeparator[numberFormat.NumberDecimalSeparator.Length - 1];
+            _numberGroupSeparator = string.IsNullOrEmpty(numberFormat.NumberGroupSeparator) ? ',' : numberFormat.NumberGroupSeparator[numberFormat.NumberGroupSeparator.Length - 1];
+            _numberGrouping = numberFormat.NumberGroupSizes != null && numberFormat.NumberGroupSizes.Length > 0
+                ? string.Join(";", numberFormat.NumberGroupSizes) + ";0"
+                : "3;0";
+            _listSeparator = ",";
+
+            _currencyTrailingDigits = numberFormat.CurrencyDecimalDigits;
+
+            _currencySymbolPrecedence = 1;
+            _calendarIdentifier = CalendarIdentifiers.Gregorian;
+            _firstDayOfWeek = (Windows.Globalization.DayOfWeek)((int)currentCulture.DateTimeFormat.FirstDayOfWeek);
+#endif
         }
 
         private static string GetCalendarIdentifierFromCalid(int calId)
@@ -518,6 +555,7 @@ namespace CalculatorApp.ViewModel.Common
             }
         }
 
+#if WINDOWS_UWP
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int ResolveLocaleName(string lpNameToResolve, [Out] char[] lpLocaleName, int cchLocaleName);
 
@@ -526,5 +564,6 @@ namespace CalculatorApp.ViewModel.Common
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int GetLocaleInfoEx(string lpLocaleName, uint LCType, ref int lpLCData, int cchData);
+#endif
     }
 }

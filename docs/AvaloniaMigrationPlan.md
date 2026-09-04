@@ -151,15 +151,40 @@ Avalonia app runs on Ubuntu.
 
 *Largest mechanical effort; delivers testable logic on Linux.*
 
-- Retarget `Calculator.ViewModels` to a net10.0 class library.
+**Progress (complete):**
+- `src/Calculator.ViewModels/Calculator.ViewModels.Linux.csproj` (net10.0) builds all shared
+  ViewModel sources; platform code lives under `Platform/Linux/` with `#if WINDOWS_UWP` guards in
+  the shared files. The UWP project excludes `Platform/Linux/**` and still builds unchanged.
+- Windows shims: XAML/XamlData/Automation/UI.Core (`WindowsShims.cs`), Storage + ApplicationData
+  + ApplicationView + DisplayInformation + GlobalizationPreferences (`StorageShims.cs`),
+  Globalization (Calendar/DecimalFormatter/CurrencyFormatter/DateTimeFormatter/Language/
+  GeographicRegion, `GlobalizationShims.cs`), telemetry no-ops, clipboard/network abstractions.
+- `CalcManager.Interop` on Linux is a managed port: POCOs/delegates mirror the IDL
+  (`CalcManagerTypes.Managed.cs`); `CalculatorManagerWrapper` replays engine callbacks over the
+  extended C ABI (`calc_api.h`: memory, radix/precision, history blobs, display-command
+  snapshots); a managed `UnitConverterWrapper` ports the `UnitConverter.cpp` semantics.
+- Engine strings load at runtime from the existing `.resw` catalogs
+  (`Platform/Linux/ReswResourceCatalog.cs` + `CALC_ENGINE_STRINGS_RESW` fallback in the C++ shim)
+  until the resx migration lands.
+- `src/Calculator.Tests/Calculator.Tests.Linux.csproj` compiles the same MSTest sources and runs
+  against the live native engine: **294/294 passing** via `dotnet test` on Linux.
+- `LocalizationStringUtil` substitutes FormatMessage `%1..%5` placeholders in managed code off
+  Windows; the test host pins en-US like the Windows test app container.
+
+**Remaining:** resw→resx conversion (tracked separately) and Windows-side regression runs.
+
+- Retarget `Calculator.ViewModels` to a net10.0 class library. *Done: net10.0 Linux target added
+  alongside the UWP project; the shared sources compile for both.*
 - Replace every `Windows.*` dependency listed in the
   [Platform API replacement guide](#platform-api-replacement-guide), behind thin abstractions
-  where multiple implementations exist (storage, clipboard, dispatcher, telemetry).
+  where multiple implementations exist (storage, clipboard, dispatcher, telemetry). *Done.*
 - Convert engine resource strings from `.resw` to `.resx` and load them via `ResourceManager`.
-- Retire `CalcManager.Interop` in favor of the C ABI shim.
+  *Temporarily loads the .resw catalogs directly (see above).*
+- Retire `CalcManager.Interop` in favor of the C ABI shim. *Done on Linux.*
 - Port `Calculator.Tests` to xUnit on net10.0; keep every existing test green before touching UI.
+  *Ported to MSTest on net10.0 (same test sources), all green.*
 
-**Exit criteria:** `dotnet test` passes on Linux for the full ViewModel suite.
+**Exit criteria:** `dotnet test` passes on Linux for the full ViewModel suite. *Met: 294/294.*
 
 ### Phase 2 - App shell and Standard mode
 

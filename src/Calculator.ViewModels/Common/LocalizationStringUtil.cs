@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CalculatorApp.ViewModel.Common
 {
@@ -51,6 +52,7 @@ namespace CalculatorApp.ViewModel.Common
                 return string.Empty;
             }
 
+#if WINDOWS_UWP
             // The localized resources use FormatMessage's %1..%5 placeholders rather than .NET's
             // {0}..{4}, so the substitution has to go through FormatMessage itself. Managed code
             // cannot build a va_list, hence ARGUMENT_ARRAY and the marshalled pointer array.
@@ -111,8 +113,36 @@ namespace CalculatorApp.ViewModel.Common
                     }
                 }
             }
+#else
+            // Linux: substitute FormatMessage's %1..%9 placeholders directly.
+            var sb = new StringBuilder(message.Length + 32);
+            for (int i = 0; i < message.Length; i++)
+            {
+                char c = message[i];
+                if (c == '%')
+                {
+                    int j = i + 1;
+                    int paramIndex = 0;
+                    while (j < message.Length && message[j] >= '0' && message[j] <= '9')
+                    {
+                        paramIndex = paramIndex * 10 + (message[j] - '0');
+                        j++;
+                    }
+
+                    if (j > i + 1 && paramIndex >= 1 && paramIndex <= args.Length)
+                    {
+                        sb.Append(args[paramIndex - 1]);
+                        i = j - 1;
+                        continue;
+                    }
+                }
+                sb.Append(c);
+            }
+            return sb.ToString();
+#endif
         }
 
+#if WINDOWS_UWP
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern uint FormatMessageW(
             uint dwFlags,
@@ -122,5 +152,6 @@ namespace CalculatorApp.ViewModel.Common
             [Out] char[] lpBuffer,
             uint nSize,
             IntPtr arguments);
+#endif
     }
 }
