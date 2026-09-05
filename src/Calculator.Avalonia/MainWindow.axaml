@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="using:CalculatorApp.Avalonia.Views"
+        x:Class="CalculatorApp.Avalonia.MainWindow"
+        Title="Calculator"
+        Width="420"
+        Height="620"
+        MinWidth="320"
+        MinHeight="500"
+        KeyDown="OnKeyDown">
+
+    <v:MainView x:Name="Main" />
+
+</Window>

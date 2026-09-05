@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Calculator.Avalonia (Avalonia/Linux migration, Phase 2)
+  Ports the UWP View layer to Avalonia 12 and drives the de-Windowed
+  Calculator.ViewModels (net10.0) from src/Calculator.ViewModels.
+  The native CalcManager engine is discovered at runtime as
+  libCalculatorNative.so via LD_LIBRARY_PATH (see run.sh).
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>CalculatorApp.Avalonia</RootNamespace>
+    <AssemblyName>Calculator.Avalonia</AssemblyName>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Calculator.ViewModels/Calculator.ViewModels.Linux.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Styles\**" />
+  </ItemGroup>
+
+  <!-- Copy the locally built native engine next to the app when available. -->
+  <Target Name="CopyNativeEngine" AfterTargets="Build">
+    <ItemGroup>
+      <NativeEngine Include="../../build/cmake/src/CalcManager.Interop/libCalculatorNative.so" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NativeEngine)" DestinationFolder="$(OutDir)" Condition="Exists('../../build/cmake/src/CalcManager.Interop/libCalculatorNative.so')" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

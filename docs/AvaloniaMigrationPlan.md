@@ -4,12 +4,12 @@ This document describes the plan to migrate Windows Calculator from its current 
 [AvaloniaUI](https://avaloniaui.net/) so that it can run on Linux. It also covers
 the platform-neutralization work required in the ViewModel and native engine layers.
 
-**Status:** Phases 0-1 complete — the engine builds and passes its tests on Linux via
-CMake/ctest, the C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0
-through source-generated P/Invoke, an Avalonia 12 demo window evaluates expressions with the
-native engine (Phase 0), and the ViewModels have been de-Windowed: they build for net10.0
-alongside the UWP project and the full test suite passes on Linux against the live native engine
-(Phase 1, 294/294 tests). Key decisions are recorded in [Decisions](#decisions).
+**Status:** Phases 0-1 complete; Phase 2 in progress. The engine builds and passes its tests
+on Linux via CMake/ctest, the C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised
+from net10.0 through source-generated P/Invoke, and the ViewModels are de-Windowed (294/294
+Linux tests against the native engine). Phase 2 has scaffolded the Avalonia app with a
+working app shell, Standard calculator view, history/memory panes (docked ↔ flyout), theming,
+and a headless view test suite (7/7). Key decisions are recorded in [Decisions](#decisions).
 
 ---
 
@@ -60,7 +60,8 @@ alongside the UWP project and the full test suite passes on Linux against the li
 ```
 src/Calculator.Avalonia          Avalonia 12, net10.0 (View, see detailed UI port mapping)
 src/Calculator.ViewModels        net10.0 class library (CommunityToolkit.Mvvm)
-src/Calculator.ViewModels.Tests  xUnit on net10.0
+src/Calculator.Tests             MSTest on net10.0 (same sources as the Windows tests)
+tests/Calculator.Avalonia.Tests  Avalonia.Headless view tests driving real controls
 src/CalcManager                  C++ (unchanged engine), CMake build on Linux + Windows
 src/CalcManager.Interop          thin C API shim exposing the engine to P/Invoke
 src/GraphingImpl                 C++ evaluator (unchanged), exposed through the same C API
@@ -190,12 +191,47 @@ Avalonia app runs on Ubuntu.
 
 ### Phase 2 - App shell and Standard mode
 
-- Scaffold `src/Calculator.Avalonia` (Avalonia 12, net10.0, `App.axaml` + `MainWindow`).
+*Goal: a runnable, engine-driven Standard calculator on Linux.*
+
+**Progress (in progress):**
+- `src/Calculator.Avalonia` (Avalonia 12.1.2, net10.0) builds and runs on Linux, driving the
+  existing `ApplicationViewModel`/`StandardCalculatorViewModel` against the native engine.
+  `run.sh` launches it (engine via `LD_LIBRARY_PATH`, string catalogs auto-discovered).
+- App shell (`MainView`): title-bar row with hamburger navigation, category name, and
+  always-on-top toggle; grouped navigation pane driven by `NavCategoryStates` (only Standard
+  is selectable until Phases 3-4); light/dark variants with a `CALCULATOR_THEME` QA override.
+- Standard view (`CalculatorView`): result display with auto-fit font stepping, horizontally
+  scrollable expression line, memory buttons row (MC/MR/M+/M-/MS), and the full Standard
+  operator + digit pad (`CalculatorButton` port with `ButtonId`→`ButtonPressed` command
+  wiring), keyboard input mapping, and error-state button disabling.
+- History and memory panes: docked tab panel when the window is ≥560 px wide, full-width
+  bottom flyouts when narrower (UWP flyout↔docked split behavior), with per-item copy/delete
+  and memory recall/add/subtract actions.
+- Theming: `CalculatorStyles.axaml` ports the UWP calc-button fill model (translucent white
+  keypad in both variants) and portrait-style glyph usage via the shipped `CalculatorIcons`
+  font. **Note:** Avalonia 12 renamed/dropped the WinUI "FillColor…Brush" palette keys; the
+  port maps them onto the Fluent `SystemControl*Brush` / `AccentButton*` equivalent keys.
+- Tests: `tests/Calculator.Avalonia.Tests` runs the real window headlessly (Avalonia.Headless,
+  MSTest) and presses actual buttons: arithmetic, error/recovery, memory, history, keyboard
+  mapping (7/7 passing against the live native engine).
+
+**Known issues (to fix before parity is declared):**
+- History item expressions serialize operator glyphs as numeric fallbacks ("1 13 2 41"
+  instead of "1 + 2 =") — a Phase 1 managed-wrapper/shim serialization bug surfaced by the
+  new UI tests; results, counts, and clear/delete behavior are correct.
+- High-contrast variant is not implemented yet; a `RequestedThemeVariant` parity pass is
+  still needed.
+- The `Avalonia.Themes.Fluent` package's theme dictionaries did not variant-switch custom
+  brushes in `Styles.Resources`; background brushes are resolved in code behind
+  (`ActualThemeVariantChanged`) as a workaround.
+
+- Scaffold `src/Calculator.Avalonia` (Avalonia 12, net10.0, `App.axaml` + `MainWindow`). *Done.*
 - Implement window chrome, mode navigation, and the history/memory panel with its
-  flyout↔docked resize behavior.
+  flyout↔docked resize behavior. *Done (native window chrome as the v1 choice).*
 - Port the Standard calculator view end-to-end: display, number pad, operators, history, and
-  memory.
+  memory. *Done, with the known issues above.*
 - Port shared controls and converters; set up theming (light/dark/high-contrast parity).
+  *Light/dark done; high-contrast pending.*
 
 **Exit criteria:** Standard mode at visual/behavioral parity on Linux, driven by the existing
 `StandardCalculatorViewModel`.
@@ -284,3 +320,11 @@ Standard/Scientific Linux app much earlier and is a natural first milestone.
 3. **Graphing in v1:** ship core modes first; graphing ships in a follow-up release.
 4. **Localization storage:** migrate resw to resx and use `ResourceManager`.
 5. **Distribution channels:** Flatpak + Arch User Repository (AUR); AppImage optional later.
+6. **Window chrome (Phase 2):** native window chrome for v1; keep-on-top via `Window.Topmost`;
+   the drag-region custom header from the UWP app stays on the back burner.
+7. **Avalonia theming (Phase 2):** Avalonia 12 dropped the WinUI "FillColor…Brush" resource
+   keys; maps to Fluent `SystemControl*Brush` / `AccentButton*` keys instead, and the custom
+   app background resolves in code-behind on `ActualThemeVariantChanged`.
+8. **UI verification (Phase 2):** headless `Avalonia.Headless` MSTest project
+   (`tests/Calculator.Avalonia.Tests`) pressing real controls against the live engine —
+   complementing the existing 294 VM tests and ctest engine suite.

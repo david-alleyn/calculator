@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- History pane (flyout and docked). DataContext: HistoryViewModel. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CalculatorApp.Avalonia.Converters"
+             x:Class="CalculatorApp.Avalonia.Views.HistoryView"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <conv:ItemSizeToVisibilityConverter x:Key="ItemSizeToVisibilityConverter" />
+        <conv:ItemSizeToVisibilityNegationConverter x:Key="ItemSizeToVisibilityNegationConverter" />
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="12,8,12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="HistoryLabel"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <Button x:Name="ClearHistoryButton"
+                    Grid.Column="1"
+                    Classes="ClearAllHistoryMemoryButtonStyle"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ClearCommand}"
+                    Content="&#xE74D;"
+                    IsVisible="{Binding ItemsCount, Converter={StaticResource ItemSizeToVisibilityNegationConverter}}" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <TextBlock x:Name="HistoryEmptyText"
+                       Margin="12,8,24,0"
+                       TextWrapping="Wrap"
+                       FontSize="14"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       IsVisible="{Binding ItemsCount, Converter={StaticResource ItemSizeToVisibilityConverter}}" />
+            <ListBox x:Name="HistoryListBox"
+                     Margin="4,0"
+                     Padding="0,8,0,8"
+                     ItemsSource="{Binding Items}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     IsVisible="{Binding ItemsCount, Converter={StaticResource ItemSizeToVisibilityNegationConverter}}"
+                     Tapped="OnItemTapped">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="4,0,12,4" Background="Transparent">
+                            <StackPanel Margin="0,6" Spacing="4">
+                                <StackPanel.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuItem Header="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=CopyHistoryMenuItem.Text}"
+                                                  Click="OnCopyItemClicked" />
+                                        <MenuItem Header="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DeleteHistoryMenuItem.Text}"
+                                                  Click="OnDeleteItemClicked" />
+                                    </MenuFlyout>
+                                </StackPanel.ContextFlyout>
+                                <TextBlock Text="{Binding Expression}"
+                                           TextAlignment="Right"
+                                           TextWrapping="Wrap"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+                                <TextBlock Text="{Binding Result}"
+                                           TextAlignment="Right"
+                                           TextWrapping="Wrap"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="CornerRadius" Value="4" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+                    </Style>
+                </ListBox.Styles>
+            </ListBox>
+        </Grid>
+    </Grid>
+
+</UserControl>

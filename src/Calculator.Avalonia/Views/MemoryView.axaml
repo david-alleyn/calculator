@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Memory pane (flyout and docked). DataContext: StandardCalculatorViewModel. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CalculatorApp.Avalonia.Converters"
+             x:Class="CalculatorApp.Avalonia.Views.MemoryView"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="12,8,12,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="MemoryLabel"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <Button x:Name="ClearMemoryButton"
+                    Grid.Column="1"
+                    Classes="ClearAllHistoryMemoryButtonStyle"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ClearMemoryCommand}"
+                    Content="&#xE74D;"
+                    IsVisible="{Binding IsMemoryEmpty, Converter={StaticResource BooleanToVisibilityNegationConverter}}" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <TextBlock x:Name="MemoryPaneEmptyText"
+                       Margin="12,8,24,0"
+                       TextWrapping="Wrap"
+                       FontSize="14"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       IsVisible="{Binding IsMemoryEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <ListBox x:Name="MemoryListBox"
+                     Margin="4,0"
+                     Padding="0,8,0,8"
+                     ItemsSource="{Binding MemorizedNumbers}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     IsVisible="{Binding IsMemoryEmpty, Converter={StaticResource BooleanToVisibilityNegationConverter}}"
+                     Tapped="OnItemTapped">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="4,0,12,0" ColumnDefinitions="*,Auto" Background="Transparent">
+                            <TextBlock Text="{Binding Value}"
+                                       TextAlignment="Right"
+                                       TextWrapping="Wrap"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                       VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Margin="8,0,0,0" Orientation="Horizontal" Spacing="4">
+                                <Button x:Name="MemClearItemButton"
+                                        Classes="CaptionMemoryItemButtonStyle"
+                                        Content="MC"
+                                        Tapped="OnClearItemTapped" />
+                                <Button x:Name="MemAddItemButton"
+                                        Classes="CaptionMemoryItemButtonStyle"
+                                        Content="M+"
+                                        Tapped="OnAddItemTapped" />
+                                <Button x:Name="MemSubtractItemButton"
+                                        Classes="CaptionMemoryItemButtonStyle"
+                                        Content="M-"
+                                        Tapped="OnSubtractItemTapped" />
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="CornerRadius" Value="4" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+                    </Style>
+                </ListBox.Styles>
+            </ListBox>
+        </Grid>
+    </Grid>
+
+</UserControl>
