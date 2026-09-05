@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Calculator
+GenericName=Calculator
+Comment=Windows Calculator ported to Linux with Avalonia
+Exec=calculator
+Icon=io.github.david_alleyn.calculator
+Terminal=false
+Categories=Utility;Calculator;
+Keywords=calculator;math;arithmetic;scientific;
+StartupNotify=true
+StartupWMClass=Calculator.Avalonia

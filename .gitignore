@@ -5,6 +5,9 @@
 
 # CMake build trees (Linux port)
 build/cmake/
+
+# Generated resx catalogs (resw2resx localization pipeline output)
+build/lang/
 CMakeUserPresets.json
 
 # User-specific files

@@ -1,0 +1,67 @@
+name: Calculator Linux CI
+run-name: CalcLinux-CI-0.${{ github.run_number }}
+on:
+  push:
+    branches: [main, release/**, feature/**]
+  pull_request:
+    branches: [main, release/**, feature/**]
+  workflow_dispatch:
+
+jobs:
+  native:
+    name: Build + test native engine (CMake)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install compiler toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang
+
+      - name: Configure (CMake + Ninja)
+        run: cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build native engine
+        run: cmake --build build/cmake
+
+      - name: Run native engine tests (ctest)
+        run: ctest --test-dir build/cmake --output-on-failure
+
+      - name: Upload native library
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculator-native
+          path: |
+            build/cmake/src/CalcManager.Interop/libCalculatorNative.so
+
+  dotnet:
+    name: Build + test managed layers (.NET)
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download native library
+        uses: actions/download-artifact@v4
+        with:
+          name: calculator-native
+          path: build/cmake/src/CalcManager.Interop
+
+      - name: Build + test ViewModels (294 tests)
+        run: dotnet test src/Calculator.Tests/Calculator.Tests.Linux.csproj -v minimal
+        env:
+          CALCULATOR_NATIVE_LIB: ${{ github.workspace }}/build/cmake/src/CalcManager.Interop/libCalculatorNative.so
+          CALC_ENGINE_STRINGS_RESW: ${{ github.workspace }}/src/Calculator/Resources/en-US/CEngineStrings.resw
+          CALCULATOR_RESOURCES_DIR: ${{ github.workspace }}/src/Calculator/Resources
+
+      - name: Build + test Avalonia view layer
+        run: dotnet test tests/Calculator.Avalonia.Tests/Calculator.Avalonia.Tests.csproj -v minimal
+        env:
+          CALCULATOR_NATIVE_LIB: ${{ github.workspace }}/build/cmake/src/CalcManager.Interop/libCalculatorNative.so
+          CALC_ENGINE_STRINGS_RESW: ${{ github.workspace }}/src/Calculator/Resources/en-US/CEngineStrings.resw
+          CALCULATOR_RESOURCES_DIR: ${{ github.workspace }}/src/Calculator/Resources

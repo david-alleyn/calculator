@@ -5,12 +5,14 @@ This document describes the plan to migrate Windows Calculator from its current 
 the platform-neutralization work required in the ViewModel and native engine layers.
 
 **Status:** Phases 0-2 complete (Standard-mode Linux app is runnable and engine-driven);
-Phases 3-4 optional. The engine builds and passes its tests on Linux via CMake/ctest, the C ABI
-shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0 through source-generated
-P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests against the native engine).
-The `src/Calculator.Avalonia` app provides the app shell, Standard calculator view, and
-history/memory panes (docked ↔ flyout) with light/dark theming, verified by a headless view test
-suite (7/7). Key decisions are recorded in [Decisions](#decisions).
+Phases 3-4 optional; Phase 5 in progress. The engine builds and passes its tests on Linux via
+CMake/ctest, the C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0
+through source-generated P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests
+against the native engine). The `src/Calculator.Avalonia` app provides the app shell, Standard
+calculator view, and history/memory panes (docked ↔ flyout) with light/dark theming, verified by
+a headless view test suite (7/7). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging
+manifests, and a resw→resx localization pipeline. Key decisions are recorded in
+[Decisions](#decisions).
 
 ---
 
@@ -262,12 +264,43 @@ interaction frame rates on a mid-range Linux desktop.
 
 ### Phase 5 - Platform tooling and packaging
 
+**Progress (in progress):**
+
+- CI: `.github/workflows/linux-ci.yml` builds the native engine (CMake + Ninja + clang) and runs
+  ctest, then builds and runs the managed layers (`dotnet test` for the 294 ViewModel tests and
+  the 7 Avalonia view tests) on `ubuntu-latest`, with the engine built once and passed between
+  jobs as an artifact. Commands verified locally against the same env-var contract the jobs set.
+- Distribution manifests under `packaging/`: an AppStream metainfo file, a desktop entry, an SVG
+  app icon, a Flatpak manifest (`packaging/flatpak/…yml`), and an AUR `PKGBUILD`
+  (`packaging/aur/PKGBUILD`). Both packages build the engine with CMake and the app with a
+  self-contained `dotnet publish`, and install the native library, resource catalogs, and a
+  `calculator` launcher (`packaging/calculator-launcher.sh`) that resolves `CALCULATOR_NATIVE_LIB`
+  and string catalogs from the install prefix.
+- Localization pipeline: `Tools/resw2resx/resw2resx.py` converts every locale's
+  `Resources.resw`/`CEngineStrings.resw` into `.resx` (ResX v2.0), emitting to
+  `build/lang/resx` (git-ignored). Verified: 120 catalogs across 60 locales, and the generated
+  output compiles cleanly through the SDK's `GenerateResource`/ResGen.
+
+**Remaining:**
+- Confirmed: `org.freedesktop.Sdk.Extension.dotnet10` (10.0.8) is published for runtimes
+  `24.08`/`25.08`. The Flatpak manifest uses the canonical offline-dotnet layout (a
+  `dotnet-runtime` module running `install.sh`, framework-dependent `--no-self-contained`
+  publish, and a generated `nuget-sources.json` whose sha512 entries were verified against
+  nuget.org). It pins the source to a commit that must be bumped to the release tag.
+- The AUR PKGBUILD was validated locally: CMake build, `--self-contained` publish producing a
+  runnable `Calculator.Avalonia`, the full `package()` install layout, and the installed
+  launcher all run end-to-end from a fake `pkgdir`. A real `flatpak-builder`/`makepkg` run and
+  RTL (Hebrew/Arabic) verification still need a target-platform/bilingual pass (the app does
+  not yet set `FlowDirection` from locale).
+- Runtime switch from the transitional `.resw` loader to `.resx`/`ResourceManager` (tracked
+  separately from Phase 1 decision #4).
+
 - GitHub Actions on `ubuntu-latest`: engine CMake + ctest pipeline and `dotnet build/test`
-  pipeline; keep existing Windows CI as long as the UWP app ships.
+  pipeline; keep existing Windows CI as long as the UWP app ships. *Done.*
 - Distribution: Flatpak manifest and Arch User Repository (AUR) packaging with desktop entry and
-  icons; AppImage optional later.
+  icons; AppImage optional later. *Drafted; validation pending.*
 - Localization pipeline for the converted resx catalogs; RTL (Hebrew/Arabic) verification on
-  Linux.
+  Linux. *Conversion tooling done; RTL verification pending.*
 
 ### Phase 6 - Cutover
 
