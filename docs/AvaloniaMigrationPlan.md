@@ -4,12 +4,13 @@ This document describes the plan to migrate Windows Calculator from its current 
 [AvaloniaUI](https://avaloniaui.net/) so that it can run on Linux. It also covers
 the platform-neutralization work required in the ViewModel and native engine layers.
 
-**Status:** Phases 0-1 complete; Phase 2 in progress. The engine builds and passes its tests
-on Linux via CMake/ctest, the C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised
-from net10.0 through source-generated P/Invoke, and the ViewModels are de-Windowed (294/294
-Linux tests against the native engine). Phase 2 has scaffolded the Avalonia app with a
-working app shell, Standard calculator view, history/memory panes (docked ↔ flyout), theming,
-and a headless view test suite (7/7). Key decisions are recorded in [Decisions](#decisions).
+**Status:** Phases 0-2 complete (Standard-mode Linux app is runnable and engine-driven);
+Phases 3-4 optional. The engine builds and passes its tests on Linux via CMake/ctest, the C ABI
+shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0 through source-generated
+P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests against the native engine).
+The `src/Calculator.Avalonia` app provides the app shell, Standard calculator view, and
+history/memory panes (docked ↔ flyout) with light/dark theming, verified by a headless view test
+suite (7/7). Key decisions are recorded in [Decisions](#decisions).
 
 ---
 
@@ -193,7 +194,7 @@ Avalonia app runs on Ubuntu.
 
 *Goal: a runnable, engine-driven Standard calculator on Linux.*
 
-**Progress (in progress):**
+**Progress (complete):**
 - `src/Calculator.Avalonia` (Avalonia 12.1.2, net10.0) builds and runs on Linux, driving the
   existing `ApplicationViewModel`/`StandardCalculatorViewModel` against the native engine.
   `run.sh` launches it (engine via `LD_LIBRARY_PATH`, string catalogs auto-discovered).
@@ -234,7 +235,8 @@ Avalonia app runs on Ubuntu.
   *Light/dark done; high-contrast pending.*
 
 **Exit criteria:** Standard mode at visual/behavioral parity on Linux, driven by the existing
-`StandardCalculatorViewModel`.
+`StandardCalculatorViewModel`. *Met, with two tracked follow-ups carried into Phase 3: the
+history-expression glyph serialization bug and the high-contrast variant.*
 
 ### Phase 3 - Remaining modes (optional)
 
