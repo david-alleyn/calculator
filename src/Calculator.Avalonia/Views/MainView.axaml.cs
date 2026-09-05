@@ -22,6 +22,11 @@ namespace CalculatorApp.Avalonia.Views
 
             _navColumn = ContentGrid.ColumnDefinitions[0];
 
+            // Start with the navigation pane collapsed; the XAML reads
+            // Width="0" but the fixed-width Border still renders until the
+            // first toggle collapses it explicitly.
+            SetNavPaneOpen(false);
+
             ApplyThemeBackground();
             if (Application.Current != null)
             {
@@ -81,12 +86,8 @@ namespace CalculatorApp.Avalonia.Views
 
         private void ToggleNavPane(object sender, RoutedEventArgs e)
         {
-            bool open = _navColumn.Width.Value > 0;
-            _navColumn.Width = open ? new GridLength(0) : new GridLength(256);
-
-            // Hide the always-on-top affordance while the pane is open, like
-            // the UWP NavigationView pane behavior.
-            AlwaysOnTopButton.IsVisible = !open;
+            bool open = NavPane.IsVisible;
+            SetNavPaneOpen(!open);
         }
 
         private void OnNavSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -95,9 +96,21 @@ namespace CalculatorApp.Avalonia.Views
             {
                 ViewModel.Mode = selected.ViewMode;
                 listBox.SelectedItem = null;
-                _navColumn.Width = new GridLength(0);
-                AlwaysOnTopButton.IsVisible = true;
+                SetNavPaneOpen(false);
             }
+        }
+
+        // The pane is a fixed-width Border; collapsing the grid column alone
+        // leaves it overflowing (Grid does not clip), so toggle the pane's own
+        // visibility too.
+        private void SetNavPaneOpen(bool open)
+        {
+            NavPane.IsVisible = open;
+            _navColumn.Width = open ? new GridLength(256) : new GridLength(0);
+
+            // Hide the always-on-top affordance while the pane is open, like
+            // the UWP NavigationView pane behavior.
+            AlwaysOnTopButton.IsVisible = !open;
         }
 
         private void ToggleAlwaysOnTop(object sender, RoutedEventArgs e)
