@@ -259,19 +259,27 @@ non-graphing mode.*
     shared number pad.
   - `ProgrammerBitFlipView` (port of `CalculatorProgrammerBitFlipPanel`): the 64 bit toggles
     generated from `BinaryDigits`, with per-word-size enablement and the `BINPOS*` commands.
-- `CalculatorView` overlays the Standard/Scientific/Programmer keypads by mode; the shell now
-  enables the Scientific and Programmer navigation items.
-- Verified: 18/18 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
+- Date calculation is ported and navigable. `DateCalculatorView` (port of `DateCalculator.xaml`)
+  covers the difference-between-dates flow (From/To pickers, difference result, days-in-days
+  secondary result) and the add/subtract flow (start date, Add/Subtract, years/months/days
+  offset combos, resulting date), using Avalonia `CalendarDatePicker`/`ComboBox` in place of the
+  UWP custom calendar template.
+- `CalculatorView` overlays the Standard/Scientific/Programmer keypads by mode; the shell swaps
+  in `DateCalculatorView` for Date mode and enables the Scientific/Programmer/Date navigation
+  items.
+- Verified: 21/21 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
   shift/inverse cube, sin(30°)=0.5 via flyout; Programmer: panel switching, hex conversion,
-  bit-flip, word-size cycling, AND) plus screenshot reviews.
+  bit-flip, word-size cycling, AND; Date: view switching, date difference, add/subtract with
+  offsets) plus screenshot reviews.
 
 **Remaining:**
-- Date calculation and Unit Converter (all categories + live currency).
+- Unit Converter (all categories + live currency).
 - Settings page, snapshots, keyboard shortcut parity.
 
 - Scientific (including Shift/inverse button collapse states) *Done.*
 - Programmer (bit-flip and radix panels) *Done.*
-- Date calculation and Unit Converter (all categories + live currency). *Pending.*
+- Date calculation *Done.*
+- Unit Converter (all categories + live currency). *Pending.*
 - Settings page, snapshots, keyboard shortcut parity. *Pending.*
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.

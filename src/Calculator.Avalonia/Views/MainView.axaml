@@ -89,10 +89,16 @@
                 </ScrollViewer>
             </Border>
 
-            <!-- The calculator (Standard mode in Phase 2) -->
+            <!-- The calculator (Standard/Scientific/Programmer) -->
             <v:CalculatorView x:Name="Calculator"
                               Grid.Column="1"
                               DataContext="{Binding CalculatorViewModel}" />
+
+            <!-- Date calculation -->
+            <v:DateCalculatorView x:Name="DateCalculator"
+                                  Grid.Column="1"
+                                  IsVisible="False"
+                                  DataContext="{Binding DateCalcViewModel}" />
         </Grid>
 
         <!-- Title bar row -->

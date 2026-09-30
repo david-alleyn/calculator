@@ -57,10 +57,42 @@ namespace CalculatorApp.Avalonia.Views
             }
         }
 
+        private ApplicationViewModel _attachedViewModel;
+
         protected override void OnDataContextChanged(System.EventArgs e)
         {
             base.OnDataContextChanged(e);
+
+            if (_attachedViewModel != null)
+            {
+                _attachedViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            }
+
+            _attachedViewModel = ViewModel;
+            if (_attachedViewModel != null)
+            {
+                _attachedViewModel.PropertyChanged += OnViewModelPropertyChanged;
+            }
+
             LimitSelectableModes();
+            UpdateModeVisibility();
+        }
+
+        private void OnViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ApplicationViewModel.Mode))
+            {
+                UpdateModeVisibility();
+            }
+        }
+
+        // Date (and later Converter) use different ViewModels and views, so the
+        // shell swaps the content view instead of keypads within CalculatorView.
+        private void UpdateModeVisibility()
+        {
+            bool isDate = ViewModel?.Mode == ViewMode.Date;
+            Calculator.IsVisible = !isDate;
+            DateCalculator.IsVisible = isDate;
         }
 
         // Only the ported views are selectable; keep the rest of the
@@ -70,6 +102,7 @@ namespace CalculatorApp.Avalonia.Views
             ViewMode.Standard,
             ViewMode.Scientific,
             ViewMode.Programmer,
+            ViewMode.Date,
         };
 
         private void LimitSelectableModes()
