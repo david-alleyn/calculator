@@ -139,6 +139,29 @@ namespace Calculator.Avalonia.Tests
         }
 
         [TestMethod]
+        public void DivideByZero_ErrorText_UsesNormalForeground()
+        {
+            var (window, viewModel) = OpenCalculator();
+
+            PressButton(window, "Num5Button");
+            PressButton(window, "DivideButton");
+            PressButton(window, "Num0Button");
+            PressButton(window, "EqualButton");
+
+            Assert.IsTrue(viewModel.CalculatorViewModel.IsInError);
+
+            var result = FindNamed<TextBlock>(window, "ResultText");
+            Assert.IsNotNull(result);
+            if (result.Foreground is global::Avalonia.Media.ISolidColorBrush brush)
+            {
+                Assert.AreNotEqual(global::Avalonia.Media.Colors.Red, brush.Color,
+                    "The error message should use the normal result foreground, not red.");
+            }
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
         public void Memory_StoreAdds_RecallRestores_AndClearEmpties()
         {
             var (window, viewModel) = OpenCalculator();

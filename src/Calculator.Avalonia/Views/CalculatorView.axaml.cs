@@ -167,10 +167,9 @@ namespace CalculatorApp.Avalonia.Views
                 return;
             }
 
+            // Error messages use the normal result foreground: the UWP control
+            // only swaps the font family so localized messages render.
             ResultText.Text = ViewModel.DisplayValue;
-            ResultText.Foreground = ViewModel.IsInError
-                ? Brushes.Red
-                : (IBrush)Application.Current.FindResource("SystemControlForegroundBaseHighBrush");
             UpdateExpression();
             UpdateMemoryCaptions();
             UpdateResultFont();
