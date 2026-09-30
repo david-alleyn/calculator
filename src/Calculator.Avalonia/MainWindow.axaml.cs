@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -100,11 +101,54 @@ namespace CalculatorApp.Avalonia
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if (TryHandleModeShortcut(e.Key, e.KeyModifiers))
+            {
+                e.Handled = true;
+                return;
+            }
+
             if (CalculatorKeyboardMap.TryMap(e.Key, e.KeyModifiers, out NumbersAndOperatorsEnum operation))
             {
                 ViewModel?.CalculatorViewModel?.ButtonPressedCommand.Execute(operation);
                 e.Handled = true;
             }
+        }
+
+        // Mode accelerators mirror the UWP access keys on the navigation items
+        // (Alt/Ctrl+1 Standard, 2 Scientific, 4 Programmer, 5 Date).
+        public bool TryHandleModeShortcut(Key key, KeyModifiers modifiers)
+        {
+            if (!modifiers.HasFlag(KeyModifiers.Alt) && !modifiers.HasFlag(KeyModifiers.Control))
+            {
+                return false;
+            }
+
+            ViewMode? mode = key switch
+            {
+                Key.D1 => ViewMode.Standard,
+                Key.D2 => ViewMode.Scientific,
+                Key.D3 => ViewMode.Graphing,
+                Key.D4 => ViewMode.Programmer,
+                Key.D5 => ViewMode.Date,
+                _ => null,
+            };
+
+            if (mode == null || ViewModel == null)
+            {
+                return false;
+            }
+
+            bool enabled = ViewModel.Categories
+                .SelectMany(group => group.Categories)
+                .Any(category => category.ViewMode == mode.Value && category.IsEnabled);
+
+            if (!enabled)
+            {
+                return false;
+            }
+
+            ViewModel.Mode = mode.Value;
+            return true;
         }
     }
 }

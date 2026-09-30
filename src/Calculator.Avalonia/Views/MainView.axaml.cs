@@ -88,6 +88,9 @@ namespace CalculatorApp.Avalonia.Views
         {
             if (e.PropertyName == nameof(ApplicationViewModel.Mode))
             {
+                // A mode change (navigation or keyboard accelerator) leaves
+                // the Settings page.
+                _showSettings = false;
                 UpdateModeVisibility();
             }
         }

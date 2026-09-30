@@ -283,10 +283,14 @@ non-graphing mode.*
   from a Settings entry in the navigation pane footer with back navigation restoring the
   previous mode.
 
+- Keyboard shortcuts: mode accelerators mirror the UWP navigation access keys
+  (Ctrl/Alt+1 Standard, +2 Scientific, +4 Programmer, +5 Date); unported/disabled modes are
+  ignored. The calculator keypad mapping was already ported.
+
 **Remaining:**
 - Snapshots: the ViewModel-layer snapshot/restore already exists (covered by the ViewModel
   tests); a desktop lifecycle hook that exercises it is a follow-up.
-- Keyboard shortcut parity (mode-switching accelerators, Alt access keys).
+- Further shortcut parity (Alt access keys on the navigation pane, non-mode shortcuts).
 - Live currency data (the converter loads currency data through the existing loader; verifying
   it against the network is a follow-up).
 
