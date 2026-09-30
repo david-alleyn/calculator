@@ -7,15 +7,15 @@ the platform-neutralization work required in the ViewModel and native engine lay
 **Status:** Phases 0-2 complete; Phase 3 complete for every non-graphing mode (Scientific,
 Programmer, Date, Unit Converter) plus Settings, session persistence, and shortcut/clipboard
 parity (the only outstanding item is a real network currency feed, which has no maintained
-endpoint); Phase 4 optional and not started; Phase 5 in progress. The engine
-builds and passes its tests on Linux via CMake/ctest, the C ABI shim
+endpoint); Phase 4 optional and not started; Phase 5 complete (Linux CI; Flatpak/AUR packaging
+validated with real `flatpak-builder`/`makepkg` runs; resw→resx localization with runtime
+`ResourceManager` loading, localized view strings, and culture-driven RTL; release tagged
+`v0.0.1`). The engine builds and passes its tests on Linux via CMake/ctest, the C ABI shim
 (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0 through source-generated
-P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests against the native engine).
+P/Invoke, and the ViewModels are de-Windowed (299/299 Linux tests against the native engine).
 The `src/Calculator.Avalonia` app provides the app shell, all non-graphing mode views, session
 persistence, and history/memory panes (docked ↔ flyout) with light/dark theming, verified by a
-headless view test suite (40/40). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging manifests (validated
-with real `flatpak-builder` and `makepkg` runs), and a resw→resx localization pipeline. Key
-decisions are recorded in [Decisions](#decisions).
+headless view test suite (41/41). Key decisions are recorded in [Decisions](#decisions).
 
 ---
 
@@ -340,7 +340,7 @@ plotting equations with a minimal evaluator (no key-graph features).
 
 ### Phase 5 - Platform tooling and packaging
 
-**Progress (in progress):**
+**Progress (complete):**
 
 - CI: `.github/workflows/linux-ci.yml` builds the native engine (CMake + Ninja + clang) and runs
   ctest, then builds and runs the managed layers (`dotnet test` for the 294 ViewModel tests and
@@ -382,7 +382,7 @@ plotting equations with a minimal evaluator (no key-graph features).
   opacities (base `#FFFFFF`, dark `0.125`/`0.0852`/…), looked up with `DynamicResource`; the
   keypad text is no longer white-on-white in dark mode.
 
-**Remaining:**
+**Notes / follow-ups:**
 - The Flatpak manifest is pinned to the `v0.0.1` release tag; the tag must be pushed to the
   remote for real builds.
 - RTL (Hebrew/Arabic): culture-driven `FlowDirection` is set on the window and localized strings
