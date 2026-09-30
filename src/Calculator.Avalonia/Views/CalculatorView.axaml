@@ -40,7 +40,6 @@
                     Margin="6,2"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
-                    FontSize="16"
                     Content="&#xE81C;"
                     IsVisible="False"
                     Click="ToggleHistoryFlyout" />

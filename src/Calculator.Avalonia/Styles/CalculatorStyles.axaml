@@ -236,7 +236,9 @@
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
     </Style>
 
-    <!-- Transparent toolbar buttons (hamburger, history, keep-on-top). -->
+    <!-- Transparent toolbar buttons (hamburger, history, keep-on-top).
+         FontSize keeps the icon glyphs scaled to the 40px buttons (the UWP
+         icon buttons use a 16px glyph in a 32px button). -->
     <Style Selector="Button.ToolbarButtonStyle">
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
@@ -244,6 +246,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="20" />
         <Setter Property="CornerRadius" Value="4" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
