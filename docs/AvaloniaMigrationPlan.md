@@ -383,13 +383,14 @@ plotting equations with a minimal evaluator (no key-graph features).
   keypad text is no longer white-on-white in dark mode.
 
 **Remaining:**
-- Bump the manifest's pinned commit to a tagged release.
-- RTL (Hebrew/Arabic): culture-driven `FlowDirection` is now set on the window and localized
-  strings render correctly (verified with Hebrew/Arabic screenshots). Note that Avalonia 12 does
-  not mirror the layout for RTL, so this is text-direction support only; the keypads keep their
-  LTR layout (a view test guards against an accidental mirror flip).
+- The Flatpak manifest is pinned to the `v0.0.1` release tag; the tag must be pushed to the
+  remote for real builds.
+- RTL (Hebrew/Arabic): culture-driven `FlowDirection` is set on the window and localized strings
+  render correctly (verified with Hebrew/Arabic screenshots). Note that Avalonia 12 does not
+  mirror the layout for RTL, so this is text-direction support only; the keypads keep their LTR
+  layout (a view test guards against an accidental mirror flip).
 - The views' UI strings (Settings, Date, the Trigonometry/Function and Bitwise/Bit shift panel
-  buttons, the HEX/DEC/OCT/BIN tags) now resolve through `AppResourceProvider`.
+  buttons, the HEX/DEC/OCT/BIN tags) resolve through `AppResourceProvider`.
 - The generated `Localization/` folder requires a clean rebuild of dependents when it first
   appears (satellites must land in the consumer's `.deps.json`); a full build always does this.
 
@@ -398,8 +399,8 @@ plotting equations with a minimal evaluator (no key-graph features).
 - Distribution: Flatpak manifest and Arch User Repository (AUR) packaging with desktop entry and
   icons; AppImage optional later. *Validated with real `makepkg` and `flatpak-builder` runs.*
 - Localization pipeline for the converted resx catalogs; RTL (Hebrew/Arabic) verification on
-  Linux. *Done: build-time conversion + runtime `ResourceManager` loading; RTL verification and
-  routing the remaining hardcoded view strings through the provider are pending.*
+  Linux. *Done: build-time conversion, runtime `ResourceManager` loading, localized view
+  strings, and culture-driven RTL text direction.*
 
 ### Phase 6 - Cutover
 
