@@ -26,8 +26,9 @@ build-options:
 command: calculator
 
 finish-args:
-  - --socket=wayland
-  - --socket=fallback-x11
+  # Avalonia's Linux backend is X11 today (Wayland support is still
+  # experimental), so grant the X11 socket; XWayland covers Wayland sessions.
+  - --socket=x11
   - --share=ipc
   - --device=dri
   - --env=DOTNET_ROOT=/app/lib/dotnet
@@ -52,9 +53,11 @@ modules:
       - cmake --build build/cmake
 
       # Framework-dependent app publish against the installed runtime, using the
-      # offline NuGet cache only.
+      # offline NuGet cache only. Deterministic source paths and no debug
+      # symbols keep the build directory out of the shipped assemblies.
       - dotnet publish src/Calculator.Avalonia/Calculator.Avalonia.csproj
         -c Release -r linux-x64 --no-self-contained
+        -p:ContinuousIntegrationBuild=true -p:DebugType=None -p:DebugSymbols=false
         -o /app/lib/calculator --source nuget-sources
 
       # Native library beside the app.
@@ -74,5 +77,5 @@ modules:
         url: https://github.com/david-alleyn/calculator.git
         # Pin to the tagged release that contains the packaging/ directory, e.g.
         #   tag: v0.0.1
-        commit: fd7bfb93a5d43dbafda2104e615bcd20e248a453
+        commit: 558cd62172ccf45606a8e5bdd1f29f8d33181de4
       - nuget-sources.json

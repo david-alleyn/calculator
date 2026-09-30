@@ -11,8 +11,8 @@ through source-generated P/Invoke, and the ViewModels are de-Windowed (294/294 L
 against the native engine). The `src/Calculator.Avalonia` app provides the app shell, Standard
 calculator view, and history/memory panes (docked ↔ flyout) with light/dark theming, verified by
 a headless view test suite (7/7). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging
-manifests, and a resw→resx localization pipeline. Key decisions are recorded in
-[Decisions](#decisions).
+manifests (validated with real `flatpak-builder` and `makepkg` runs), and a resw→resx
+localization pipeline. Key decisions are recorded in [Decisions](#decisions).
 
 ---
 
@@ -281,24 +281,34 @@ interaction frame rates on a mid-range Linux desktop.
   `build/lang/resx` (git-ignored). Verified: 120 catalogs across 60 locales, and the generated
   output compiles cleanly through the SDK's `GenerateResource`/ResGen.
 
+**Packaging validation (real runs):**
+- Confirmed `org.freedesktop.Sdk.Extension.dotnet10` (10.0.8) is published for runtimes
+  `24.08`/`25.08`; the manifest uses the canonical offline-dotnet layout (a `dotnet-runtime`
+  module running `install.sh`, framework-dependent `--no-self-contained` publish, and a
+  generated `nuget-sources.json` whose sha512 entries were verified against nuget.org).
+- AUR: a real `makepkg` run builds the engine, self-contained app, and package; the packaged
+  app launches from the extracted package root. Deterministic source paths plus
+  `-p:DebugType=None` keep the build directory out of the shipped assemblies (no makepkg
+  `$srcdir` warning).
+- Flatpak: a real `flatpak-builder` run (via the user-level `org.flatpak.Builder`, with the
+  host user installation exposed through `FLATPAK_USER_DIR`) builds and exports the app;
+  `flatpak run` launches it and a screenshot confirms correct rendering. The `finish-args` use
+  `--socket=x11` because Avalonia's Linux backend is X11 today (`fallback-x11` blocks X11 when
+  Wayland is present).
+- Dark theme fix: the calc button fills are now per-theme `ThemeDictionaries` with the UWP
+  opacities (base `#FFFFFF`, dark `0.125`/`0.0852`/…), looked up with `DynamicResource`; the
+  keypad text is no longer white-on-white in dark mode.
+
 **Remaining:**
-- Confirmed: `org.freedesktop.Sdk.Extension.dotnet10` (10.0.8) is published for runtimes
-  `24.08`/`25.08`. The Flatpak manifest uses the canonical offline-dotnet layout (a
-  `dotnet-runtime` module running `install.sh`, framework-dependent `--no-self-contained`
-  publish, and a generated `nuget-sources.json` whose sha512 entries were verified against
-  nuget.org). It pins the source to a commit that must be bumped to the release tag.
-- The AUR PKGBUILD was validated locally: CMake build, `--self-contained` publish producing a
-  runnable `Calculator.Avalonia`, the full `package()` install layout, and the installed
-  launcher all run end-to-end from a fake `pkgdir`. A real `flatpak-builder`/`makepkg` run and
-  RTL (Hebrew/Arabic) verification still need a target-platform/bilingual pass (the app does
-  not yet set `FlowDirection` from locale).
+- Bump the manifest's pinned commit to a tagged release; RTL (Hebrew/Arabic) verification still
+  needs a bilingual pass (the app does not yet set `FlowDirection` from locale).
 - Runtime switch from the transitional `.resw` loader to `.resx`/`ResourceManager` (tracked
   separately from Phase 1 decision #4).
 
 - GitHub Actions on `ubuntu-latest`: engine CMake + ctest pipeline and `dotnet build/test`
   pipeline; keep existing Windows CI as long as the UWP app ships. *Done.*
 - Distribution: Flatpak manifest and Arch User Repository (AUR) packaging with desktop entry and
-  icons; AppImage optional later. *Drafted; validation pending.*
+  icons; AppImage optional later. *Validated with real `makepkg` and `flatpak-builder` runs.*
 - Localization pipeline for the converted resx catalogs; RTL (Hebrew/Arabic) verification on
   Linux. *Conversion tooling done; RTL verification pending.*
 

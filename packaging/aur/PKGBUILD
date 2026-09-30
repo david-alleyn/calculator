@@ -25,9 +25,13 @@ build() {
   cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_NATIVE_TESTS=OFF
   cmake --build build/cmake
 
-  # Self-contained app publish (bundles the .NET runtime).
+  # Self-contained app publish (bundles the .NET runtime). Deterministic
+  # source paths and no debug symbols keep the build directory out of the
+  # shipped assemblies.
   dotnet publish src/Calculator.Avalonia/Calculator.Avalonia.csproj \
-    -c Release -r linux-x64 --self-contained true -o build/publish
+    -c Release -r linux-x64 --self-contained true \
+    -p:ContinuousIntegrationBuild=true -p:DebugType=None -p:DebugSymbols=false \
+    -o build/publish
 }
 
 package() {

@@ -50,6 +50,17 @@ namespace CalculatorApp.Avalonia
                                 ViewModel.CalculatorViewModel.ButtonPressedCommand.Execute(operation);
                             }
                         }
+
+                        // Give the dispatcher a couple of passes so layout/render
+                        // pick up the probe's display changes before capturing.
+                        var captureTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+                        captureTimer.Tick += (_, _) =>
+                        {
+                            captureTimer.Stop();
+                            CaptureContent(shotPath);
+                        };
+                        captureTimer.Start();
+                        return;
                     }
 
                     CaptureContent(shotPath);
