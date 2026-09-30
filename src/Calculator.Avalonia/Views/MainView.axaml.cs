@@ -22,6 +22,12 @@ namespace CalculatorApp.Avalonia.Views
 
             _navColumn = ContentGrid.ColumnDefinitions[0];
 
+            Settings.BackRequested += (_, _) =>
+            {
+                _showSettings = false;
+                UpdateModeVisibility();
+            };
+
             // Start with the navigation pane collapsed; the XAML reads
             // Width="0" but the fixed-width Border still renders until the
             // first toggle collapses it explicitly.
@@ -86,14 +92,32 @@ namespace CalculatorApp.Avalonia.Views
             }
         }
 
+        private bool _showSettings;
+
+        private void ShowSettings(object sender, RoutedEventArgs e)
+        {
+            _showSettings = true;
+            UpdateModeVisibility();
+        }
+
         // Date and Converter use different ViewModels and views, so the shell
         // swaps the content view instead of keypads within CalculatorView.
         private void UpdateModeVisibility()
         {
+            if (_showSettings)
+            {
+                Calculator.IsVisible = false;
+                DateCalculator.IsVisible = false;
+                UnitConverter.IsVisible = false;
+                Settings.IsVisible = true;
+                return;
+            }
+
             ViewMode mode = ViewModel?.Mode ?? ViewMode.None;
             bool isDate = mode == ViewMode.Date;
             bool isConverter = NavCategory.IsConverterViewMode(mode);
 
+            Settings.IsVisible = false;
             Calculator.IsVisible = !isDate && !isConverter;
             DateCalculator.IsVisible = isDate;
             UnitConverter.IsVisible = isConverter;
@@ -141,6 +165,7 @@ namespace CalculatorApp.Avalonia.Views
         {
             if (sender is ListBox listBox && listBox.SelectedItem is NavCategory selected)
             {
+                _showSettings = false;
                 ViewModel.Mode = selected.ViewMode;
                 listBox.SelectedItem = null;
                 SetNavPaneOpen(false);

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings page (port of Settings.xaml): appearance/theme selection and the
+  about section. Hosted by the shell; back returns to the previous mode.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalculatorApp.Avalonia.Views.SettingsView"
+             x:Name="SettingsRoot">
+
+    <Grid Margin="12,8" RowDefinitions="Auto,*">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="BackButton"
+                    Classes="ToolbarButtonStyle"
+                    Content="&#xE72B;"
+                    Click="BackButton_Click" />
+            <TextBlock Text="Settings"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="0,12,0,0">
+            <StackPanel Spacing="6">
+                <TextBlock Text="Appearance"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                <TextBlock Text="App theme"
+                           Margin="0,8,0,0"
+                           FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+                <RadioButton x:Name="LightThemeRadioButton" Content="Light" Click="Theme_Click" />
+                <RadioButton x:Name="DarkThemeRadioButton" Content="Dark" Click="Theme_Click" />
+                <RadioButton x:Name="SystemThemeRadioButton" Content="Use system setting" Click="Theme_Click" />
+
+                <TextBlock Text="About"
+                           Margin="0,20,0,0"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                <TextBlock x:Name="AboutBuildVersion"
+                           Margin="0,4,0,0"
+                           FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           Text="Calculator 0.0.1 (Avalonia Linux port)" />
+
+                <Button x:Name="FeedbackButton"
+                        Margin="0,8,0,0"
+                        Classes="OperatorPanelButton"
+                        Content="Send feedback"
+                        Click="Feedback_Click" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

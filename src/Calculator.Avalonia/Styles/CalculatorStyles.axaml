@@ -204,6 +204,25 @@
         <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
     </Style>
 
+    <!-- Settings entry in the navigation pane footer. -->
+    <Style Selector="Button.SettingsNavButton">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.SettingsNavButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="Button.SettingsNavButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+    </Style>
+
     <!-- Transparent toolbar buttons (hamburger, history, keep-on-top). -->
     <Style Selector="Button.ToolbarButtonStyle">
         <Setter Property="Width" Value="40" />

@@ -278,8 +278,15 @@ non-graphing mode.*
   offsets; Converter: view switching, typed conversion, unit selection, per-category negate)
   plus screenshot reviews, and 294/294 ViewModel tests.
 
+- Settings page is ported. `SettingsView` provides the theme selector (Light/Dark/Use system
+  setting, driving `Application.RequestedThemeVariant`) and the about/feedback section, opened
+  from a Settings entry in the navigation pane footer with back navigation restoring the
+  previous mode.
+
 **Remaining:**
-- Settings page, snapshots, keyboard shortcut parity.
+- Snapshots: the ViewModel-layer snapshot/restore already exists (covered by the ViewModel
+  tests); a desktop lifecycle hook that exercises it is a follow-up.
+- Keyboard shortcut parity (mode-switching accelerators, Alt access keys).
 - Live currency data (the converter loads currency data through the existing loader; verifying
   it against the network is a follow-up).
 

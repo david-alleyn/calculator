@@ -31,7 +31,8 @@
                     Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
                     BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                     BorderThickness="0,0,1,0">
-                <ScrollViewer>
+                <Grid RowDefinitions="*,Auto">
+                <ScrollViewer Grid.Row="0">
                     <ItemsControl x:Name="NavCategoriesList" ItemsSource="{Binding Categories}" Margin="0,8,0,8">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -87,6 +88,21 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+
+                <Button x:Name="SettingsButton"
+                        Grid.Row="1"
+                        Classes="SettingsNavButton"
+                        Margin="4,4,4,8"
+                        Click="ShowSettings">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock FontFamily="{DynamicResource CalculatorFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="&#xE713;" />
+                        <TextBlock Text="Settings" FontSize="14" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                </Grid>
             </Border>
 
             <!-- The calculator (Standard/Scientific/Programmer) -->
@@ -105,6 +121,9 @@
                                  Grid.Column="1"
                                  IsVisible="False"
                                  DataContext="{Binding ConverterViewModel}" />
+
+            <!-- Settings -->
+            <v:SettingsView x:Name="Settings" Grid.Column="1" IsVisible="False" />
         </Grid>
 
         <!-- Title bar row -->
