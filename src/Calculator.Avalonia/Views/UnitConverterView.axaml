@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Unit converter view (port of UnitConverter.xaml): from/to value displays,
+  unit selectors, supplementary results, and the converter number pad.
+  DataContext: UnitConverterViewModel.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:CalculatorApp.Avalonia.Controls"
+             x:Class="CalculatorApp.Avalonia.Views.UnitConverterView"
+             x:Name="ConverterRoot">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="UnitTemplate">
+            <TextBlock Text="{Binding Name}" TextWrapping="NoWrap" />
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="12,8" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+        <!-- From value -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,4">
+            <TextBlock x:Name="CurrencySymbol1Block"
+                       Text="{Binding CurrencySymbol1}"
+                       FontSize="24"
+                       VerticalAlignment="Center"
+                       IsVisible="False"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <TextBlock x:Name="Value1Text"
+                       Grid.Column="1"
+                       Text="{Binding Value1}"
+                       FontSize="40"
+                       HorizontalAlignment="Right"
+                       TextWrapping="NoWrap"
+                       Cursor="Hand"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       PointerPressed="Value1_PointerPressed" />
+        </Grid>
+
+        <ComboBox x:Name="Units1"
+                  Grid.Row="1"
+                  Margin="0,0,0,10"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding Units}"
+                  SelectedItem="{Binding Unit1, Mode=OneWay}"
+                  ItemTemplate="{StaticResource UnitTemplate}"
+                  IsEnabled="{Binding IsDropDownEnabled}"
+                  SelectionChanged="Units1_SelectionChanged" />
+
+        <!-- To value -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,0,0,4">
+            <TextBlock x:Name="CurrencySymbol2Block"
+                       Text="{Binding CurrencySymbol2}"
+                       FontSize="24"
+                       VerticalAlignment="Center"
+                       IsVisible="False"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <TextBlock x:Name="Value2Text"
+                       Grid.Column="1"
+                       Text="{Binding Value2}"
+                       FontSize="40"
+                       HorizontalAlignment="Right"
+                       TextWrapping="NoWrap"
+                       Cursor="Hand"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       PointerPressed="Value2_PointerPressed" />
+        </Grid>
+
+        <ComboBox x:Name="Units2"
+                  Grid.Row="3"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding Units}"
+                  SelectedItem="{Binding Unit2, Mode=OneWay}"
+                  ItemTemplate="{StaticResource UnitTemplate}"
+                  IsEnabled="{Binding IsDropDownEnabled}"
+                  SelectionChanged="Units2_SelectionChanged" />
+
+        <!-- Supplementary results / currency status -->
+        <StackPanel Grid.Row="4" Margin="0,10,0,0" Spacing="2">
+            <TextBlock x:Name="CurrencyRatioEqualityBlock"
+                       FontSize="12"
+                       IsVisible="False"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       Text="{Binding CurrencyRatioEquality}" />
+            <TextBlock x:Name="CurrencyTimestampTextBlock"
+                       FontSize="12"
+                       IsVisible="False"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       Text="{Binding CurrencyTimestamp}" />
+        </StackPanel>
+
+        <!-- Number pad -->
+        <Grid Grid.Row="5"
+              MinHeight="260"
+              Margin="3,0,3,3"
+              RowDefinitions="*,*,*,*,*"
+              ColumnDefinitions="*,*,*">
+            <c:CalculatorButton x:Name="ClearEntryButton"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Classes="CalcButton OperatorButton"
+                                FontSize="14"
+                                Content="CE"
+                                ButtonId="Clear" />
+            <c:CalculatorButton x:Name="BackSpaceButton"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                FontSize="14"
+                                Content="&#xE94F;"
+                                ButtonId="Backspace" />
+
+            <c:CalculatorButton x:Name="Num7Button" Grid.Row="1" Grid.Column="0" Classes="CalcButton NumericButtonStyle24" Content="7" ButtonId="Seven" />
+            <c:CalculatorButton x:Name="Num8Button" Grid.Row="1" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="8" ButtonId="Eight" />
+            <c:CalculatorButton x:Name="Num9Button" Grid.Row="1" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="9" ButtonId="Nine" />
+            <c:CalculatorButton x:Name="Num4Button" Grid.Row="2" Grid.Column="0" Classes="CalcButton NumericButtonStyle24" Content="4" ButtonId="Four" />
+            <c:CalculatorButton x:Name="Num5Button" Grid.Row="2" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="5" ButtonId="Five" />
+            <c:CalculatorButton x:Name="Num6Button" Grid.Row="2" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="6" ButtonId="Six" />
+            <c:CalculatorButton x:Name="Num1Button" Grid.Row="3" Grid.Column="0" Classes="CalcButton NumericButtonStyle24" Content="1" ButtonId="One" />
+            <c:CalculatorButton x:Name="Num2Button" Grid.Row="3" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="2" ButtonId="Two" />
+            <c:CalculatorButton x:Name="Num3Button" Grid.Row="3" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="3" ButtonId="Three" />
+            <c:CalculatorButton x:Name="NegateButton" Grid.Row="4" Grid.Column="0" Classes="CalcButton SymbolOperatorKeypadButton" FontSize="16" Content="&#xF898;" ButtonId="Negate" IsVisible="False" />
+            <c:CalculatorButton x:Name="Num0Button" Grid.Row="4" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="0" ButtonId="Zero" />
+            <c:CalculatorButton x:Name="DecimalSeparatorButton" Grid.Row="4" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="." ButtonId="Decimal" IsEnabled="{Binding IsDecimalEnabled}" />
+        </Grid>
+    </Grid>
+</UserControl>

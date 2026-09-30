@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Standard calculator view (port of Calculator.xaml / CalculatorStandardOperators.xaml /
+  NumberPad.xaml, Standard-mode subset). DataContext: StandardCalculatorViewModel.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:CalculatorApp.Avalonia.Controls"
+             xmlns:conv="using:CalculatorApp.Avalonia.Converters"
+             xmlns:v="using:CalculatorApp.Avalonia.Views"
+             x:Class="CalculatorApp.Avalonia.Views.CalculatorView"
+             x:Name="CalcRoot">
+
+    <UserControl.Resources>
+        <conv:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
+    </UserControl.Resources>
+
+    <Grid x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0" MinWidth="0" MaxWidth="320" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Main calculator column -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- History button (shown when the docked panel is collapsed) -->
+            <Button x:Name="HistoryButton"
+                    Grid.Row="0"
+                    Classes="ToolbarButtonStyle"
+                    Margin="6,2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Content="&#xE81C;"
+                    IsVisible="False"
+                    Click="ToggleHistoryFlyout" />
+
+            <!-- Expression -->
+            <ScrollViewer x:Name="ExpressionScroller"
+                          Grid.Row="1"
+                          Margin="6,0"
+                          VerticalAlignment="Bottom"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Disabled">
+                <TextBlock x:Name="ExpressionText"
+                           FontSize="14"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           Foreground="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                           TextTrimming="None" />
+            </ScrollViewer>
+
+            <!-- Result -->
+            <TextBlock x:Name="ResultText"
+                       Grid.Row="2"
+                       Margin="12,0"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Top"
+                       Focusable="True"
+                       FontSize="46"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+            <!-- Memory controls row (non-programmer modes) -->
+            <Grid x:Name="MemoryPanel"
+                  Grid.Row="3"
+                  Margin="3,0"
+                  IsVisible="{Binding IsProgrammer, Converter={StaticResource BooleanToVisibilityNegationConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" MaxWidth="80" />
+                    <ColumnDefinition Width="1*" MaxWidth="80" />
+                    <ColumnDefinition Width="1*" MaxWidth="80" />
+                    <ColumnDefinition Width="1*" MaxWidth="80" />
+                    <ColumnDefinition Width="1*" MaxWidth="80" />
+                    <ColumnDefinition Width="0" MaxWidth="80" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="ClearMemoryButton"
+                        Grid.Column="0"
+                        Classes="CaptionButton"
+                        Content="&#xF754;"
+                        Command="{Binding ClearMemoryCommand}"
+                        IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="MemRecall"
+                                    Grid.Column="1"
+                                    Classes="CaptionButton"
+                                    Content="&#xF755;"
+                                    Command="{Binding MemoryItemPressed}"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}">
+                    <c:CalculatorButton.CommandParameter>
+                        <x:Int32>0</x:Int32>
+                    </c:CalculatorButton.CommandParameter>
+                </c:CalculatorButton>
+                <c:CalculatorButton x:Name="MemPlus"
+                                    Grid.Column="2"
+                                    Classes="CaptionButton"
+                                    Content="&#xF757;"
+                                    Command="{Binding MemoryAdd}"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}">
+                    <c:CalculatorButton.CommandParameter>
+                        <x:Int32>0</x:Int32>
+                    </c:CalculatorButton.CommandParameter>
+                </c:CalculatorButton>
+                <c:CalculatorButton x:Name="MemMinus"
+                                    Grid.Column="3"
+                                    Classes="CaptionButton"
+                                    Content="&#xF758;"
+                                    Command="{Binding MemorySubtract}"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}">
+                    <c:CalculatorButton.CommandParameter>
+                        <x:Int32>0</x:Int32>
+                    </c:CalculatorButton.CommandParameter>
+                </c:CalculatorButton>
+                <c:CalculatorButton x:Name="MemButton"
+                                    Grid.Column="4"
+                                    Classes="CaptionButton"
+                                    Content="&#xF756;"
+                                    ButtonId="Memory" />
+                <Button x:Name="MemoryFlyoutButton"
+                        Grid.Column="5"
+                        Classes="ToolbarButtonStyle"
+                        Width="32"
+                        Height="32"
+                        Margin="4,0,4,0"
+                        Content="&#xE61D;"
+                        Click="ToggleMemoryFlyout" />
+            </Grid>
+
+            <!-- Programmer display: radix rows + keypad toggle + word size -->
+            <v:ProgrammerDisplayView x:Name="ProgrammerDisplay"
+                                     Grid.Row="3"
+                                     IsVisible="{Binding IsProgrammer}" />
+
+            <!-- Number pad panel: standard/scientific/programmer operators -->
+            <Grid x:Name="NumpadPanel" Grid.Row="4" Margin="3,0,3,3">
+                <Grid x:Name="StandardNumpad" IsVisible="{Binding IsStandard}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0" />
+                    <ColumnDefinition Width="0" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="0" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Row 0: % CE C backspace -->
+                <c:CalculatorButton x:Name="PercentButton"
+                                    Grid.Row="0" Grid.Column="2"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xE94C;"
+                                    ButtonId="Percent"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="ClearEntryButton"
+                                    Grid.Row="0" Grid.Column="3"
+                                    Classes="CalcButton OperatorButton"
+                                    FontSize="16"
+                                    Content="CE"
+                                    ButtonId="ClearEntry" />
+                <c:CalculatorButton x:Name="ClearButton"
+                                    Grid.Row="0" Grid.Column="4"
+                                    Classes="CalcButton OperatorButton"
+                                    FontSize="16"
+                                    Content="C"
+                                    ButtonId="Clear" />
+                <c:CalculatorButton x:Name="BackSpaceButton"
+                                    Grid.Row="0" Grid.Column="5"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    FontSize="16"
+                                    Content="&#xE94F;"
+                                    ButtonId="Backspace" />
+
+                <!-- Row 1: 1/x  x²  sqrt -->
+                <c:CalculatorButton x:Name="InvertButton"
+                                    Grid.Row="1" Grid.Column="2"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xF7C9;"
+                                    ButtonId="Invert"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="XPower2Button"
+                                    Grid.Row="1" Grid.Column="3"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xF7C8;"
+                                    ButtonId="XPower2"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="SquareRootButton"
+                                    Grid.Row="1" Grid.Column="4"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xF899;"
+                                    ButtonId="Sqrt"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+
+                <!-- Operator column: divide multiply minus plus equals -->
+                <c:CalculatorButton x:Name="DivideButton"
+                                    Grid.Row="1" Grid.Column="5"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xE94A;"
+                                    ButtonId="Divide"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="MultiplyButton"
+                                    Grid.Row="2" Grid.Column="5"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xE947;"
+                                    ButtonId="Multiply"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="MinusButton"
+                                    Grid.Row="3" Grid.Column="5"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xE949;"
+                                    ButtonId="Subtract"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="PlusButton"
+                                    Grid.Row="4" Grid.Column="5"
+                                    Classes="CalcButton OperatorButton SymbolOperatorButton"
+                                    Content="&#xE948;"
+                                    ButtonId="Add"
+                                    IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="EqualButton"
+                                    Grid.Row="5" Grid.Column="5"
+                                    Classes="AccentEmphasizedCalcButton"
+                                    Content="&#xE94E;"
+                                    ButtonId="Equals" />
+
+                <!-- Digit pad: rows 2-5, columns 2-4 -->
+                <c:CalculatorButton x:Name="Num7Button"  Grid.Row="2" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="7" ButtonId="Seven" />
+                <c:CalculatorButton x:Name="Num8Button"  Grid.Row="2" Grid.Column="3" Classes="CalcButton NumericButtonStyle24" Content="8" ButtonId="Eight" />
+                <c:CalculatorButton x:Name="Num9Button"  Grid.Row="2" Grid.Column="4" Classes="CalcButton NumericButtonStyle24" Content="9" ButtonId="Nine" />
+                <c:CalculatorButton x:Name="Num4Button"  Grid.Row="3" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="4" ButtonId="Four" />
+                <c:CalculatorButton x:Name="Num5Button"  Grid.Row="3" Grid.Column="3" Classes="CalcButton NumericButtonStyle24" Content="5" ButtonId="Five" />
+                <c:CalculatorButton x:Name="Num6Button"  Grid.Row="3" Grid.Column="4" Classes="CalcButton NumericButtonStyle24" Content="6" ButtonId="Six" />
+                <c:CalculatorButton x:Name="Num1Button"  Grid.Row="4" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="1" ButtonId="One" />
+                <c:CalculatorButton x:Name="Num2Button"  Grid.Row="4" Grid.Column="3" Classes="CalcButton NumericButtonStyle24" Content="2" ButtonId="Two" />
+                <c:CalculatorButton x:Name="Num3Button"  Grid.Row="4" Grid.Column="4" Classes="CalcButton NumericButtonStyle24" Content="3" ButtonId="Three" />
+                <c:CalculatorButton x:Name="NegateButton" Grid.Row="5" Grid.Column="2" Classes="CalcButton SymbolOperatorKeypadButton" Content="&#xF898;" ButtonId="Negate" IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+                <c:CalculatorButton x:Name="Num0Button"  Grid.Row="5" Grid.Column="3" Classes="CalcButton NumericButtonStyle24" Content="0" ButtonId="Zero" />
+                <c:CalculatorButton x:Name="DecimalSeparatorButton" Grid.Row="5" Grid.Column="4" Classes="CalcButton NumericButtonStyle24" Content="." ButtonId="Decimal" IsEnabled="{Binding IsDecimalEnabled}" />
+                </Grid>
+
+                <v:ScientificOperatorsView x:Name="ScientificOperators" IsVisible="{Binding IsScientific}" />
+
+                <v:ProgrammerOperatorsView x:Name="ProgrammerOperators" IsVisible="{Binding AreProgrammerRadixOperatorsVisible}" />
+
+                <v:ProgrammerBitFlipView x:Name="ProgrammerBitFlip" IsVisible="{Binding IsBinaryBitFlippingEnabled}" />
+            </Grid>
+        </Grid>
+
+        <!-- Docked history/memory panel -->
+        <Border x:Name="DockPane"
+                Grid.Column="1"
+                Width="320"
+                HorizontalAlignment="Right"
+                IsVisible="False"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="1,0,0,0"
+                Padding="0,8,0,0">
+            <TabControl x:Name="DockPivot" Background="Transparent" BorderThickness="0">
+                <TabItem x:Name="HistoryTab" Classes="DockPivotTabItem">
+                    <TabItem.Header>
+                        <TextBlock x:Name="DockHistoryHeader" Text="History" />
+                    </TabItem.Header>
+                    <v:HistoryView x:Name="HistoryDockedView" DataContext="{Binding HistoryVM}" />
+                </TabItem>
+                <TabItem x:Name="MemoryTab" Classes="DockPivotTabItem">
+                    <TabItem.Header>
+                        <TextBlock x:Name="DockMemoryHeader" Text="Memory" />
+                    </TabItem.Header>
+                    <v:MemoryView x:Name="MemoryDockedView" />
+                </TabItem>
+            </TabControl>
+        </Border>
+
+        <!-- Full-width history flyout (narrow windows) -->
+        <Popup x:Name="HistoryPopup" Placement="Custom">
+            <Border x:Name="HistoryFlyoutHost"
+                    MinHeight="120"
+                    Background="{DynamicResource AppWindowBackgroundLightBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="0,1,0,0">
+                <v:HistoryView x:Name="HistoryFlyoutView" />
+            </Border>
+        </Popup>
+
+        <!-- Full-width memory flyout (narrow windows) -->
+        <Popup x:Name="MemoryPopup" Placement="Custom">
+            <Border x:Name="MemoryFlyoutHost"
+                    MinHeight="120"
+                    Background="{DynamicResource AppWindowBackgroundLightBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="0,1,0,0">
+                <v:MemoryView x:Name="MemoryFlyoutView" />
+            </Border>
+        </Popup>
+    </Grid>
+
+</UserControl>

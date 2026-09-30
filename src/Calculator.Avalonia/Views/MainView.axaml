@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  App shell (port of MainPage.xaml): title bar row with hamburger, category
+  name and always-on-top toggle, a collapsible navigation pane, and the
+  calculator view. DataContext: ApplicationViewModel.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="using:CalculatorApp.Avalonia.Views"
+             xmlns:conv="using:CalculatorApp.Avalonia.Converters"
+             x:Class="CalculatorApp.Avalonia.Views.MainView"
+             x:Name="PageRoot">
+
+    <UserControl.Resources>
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
+    </UserControl.Resources>
+
+    <Grid x:Name="AppShellRoot" Background="{DynamicResource AppWindowBackgroundLightBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Content row: navigation pane + calculator -->
+        <Grid x:Name="ContentGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Mode navigation pane -->
+            <Border x:Name="NavPane"
+                    Grid.Column="0"
+                    Width="256"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid RowDefinitions="*,Auto">
+                <ScrollViewer Grid.Row="0">
+                    <ItemsControl x:Name="NavCategoriesList" ItemsSource="{Binding Categories}" Margin="0,8,0,8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="{Binding Name}"
+                                               Margin="16,8,16,4"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    <ListBox ItemsSource="{Binding Categories}"
+                                             SelectionMode="Single"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             SelectionChanged="OnNavSelectionChanged">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                                      Margin="4,0,8,0"
+                                                      IsEnabled="{Binding IsEnabled}"
+                                                      Opacity="1">
+                                                    <TextBlock Text="{Binding Glyph}"
+                                                               FontFamily="{DynamicResource CalculatorFontFamily}"
+                                                               FontSize="16"
+                                                               Width="32"
+                                                               VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding Name}"
+                                                               FontSize="14"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                    <TextBlock Grid.Column="2"
+                                                               Classes="AccessKeyHint"
+                                                               Text="{Binding AccessKey}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                        <ListBox.Styles>
+                                            <Style Selector="ListBoxItem">
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="CornerRadius" Value="4" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+                                                <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:disabled">
+                                                <Setter Property="Opacity" Value="0.45" />
+                                            </Style>
+                                        </ListBox.Styles>
+                                    </ListBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Button x:Name="SettingsButton"
+                        Grid.Row="1"
+                        Classes="SettingsNavButton"
+                        Margin="4,4,4,8"
+                        Click="ShowSettings">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock FontFamily="{DynamicResource CalculatorFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="&#xE713;" />
+                        <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=SettingsHeader.Text}" FontSize="14" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                </Grid>
+            </Border>
+
+            <!-- The calculator (Standard/Scientific/Programmer) -->
+            <v:CalculatorView x:Name="Calculator"
+                              Grid.Column="1"
+                              DataContext="{Binding CalculatorViewModel}" />
+
+            <!-- Date calculation -->
+            <v:DateCalculatorView x:Name="DateCalculator"
+                                  Grid.Column="1"
+                                  IsVisible="False"
+                                  DataContext="{Binding DateCalcViewModel}" />
+
+            <!-- Unit converter -->
+            <v:UnitConverterView x:Name="UnitConverter"
+                                 Grid.Column="1"
+                                 IsVisible="False"
+                                 DataContext="{Binding ConverterViewModel}" />
+
+            <!-- Settings -->
+            <v:SettingsView x:Name="Settings" Grid.Column="1" IsVisible="False" />
+        </Grid>
+
+        <!-- Title bar row -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="48,*,Auto">
+                <!-- Drawn rather than a glyph: the bundled icon font has no
+                     hamburger codepoint (E700). -->
+                <Button x:Name="HamburgerButton"
+                        Grid.Column="0"
+                        Classes="ToolbarButtonStyle"
+                        Margin="4,4,0,4"
+                        Click="ToggleNavPane">
+                    <Path Width="16"
+                          Height="12"
+                          Stretch="None"
+                          Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                          StrokeThickness="1.5"
+                          Data="M0,1 H16 M0,6 H16 M0,11 H16" />
+                </Button>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding CategoryName}"
+                           VerticalAlignment="Center"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                <Button x:Name="AlwaysOnTopButton"
+                        Grid.Column="2"
+                        Classes="ToolbarButtonStyle"
+                        Width="40"
+                        Margin="0,4,4,4"
+                        Content="&#xEE49;"
+                        Click="ToggleAlwaysOnTop" />
+            </Grid>
+        </Border>
+    </Grid>
+
+</UserControl>

@@ -2,53 +2,54 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
-using Windows.Storage.Streams;
+using System.IO;
 
 namespace CalculatorApp.ViewModel.Common
 {
     /// <summary>
-    /// Serializes expression commands (operand, unary, binary, parentheses) to a DataWriter.
-    /// This is the C# port of the C++ SerializeCommandVisitor.
+    /// Serializes expression commands (operand, unary, binary, parentheses).
+    /// This is the C# port of the C++ SerializeCommandVisitor; it uses a managed
+    /// binary writer so it runs on both Windows and Linux.
     /// </summary>
     public class ExpressionCommandSerializer
     {
-        private readonly DataWriter _dataWriter;
+        private readonly BinaryWriter _writer;
 
-        public ExpressionCommandSerializer(DataWriter dataWriter)
+        public ExpressionCommandSerializer(BinaryWriter writer)
         {
-            _dataWriter = dataWriter;
+            _writer = writer;
         }
 
         public void SerializeOperand(bool isNegative, bool isDecimalPresent, bool isSciFmt, IList<int> commands)
         {
-            _dataWriter.WriteBoolean(isNegative);
-            _dataWriter.WriteBoolean(isDecimalPresent);
-            _dataWriter.WriteBoolean(isSciFmt);
+            _writer.Write(isNegative);
+            _writer.Write(isDecimalPresent);
+            _writer.Write(isSciFmt);
 
-            _dataWriter.WriteUInt32((uint)commands.Count);
+            _writer.Write((uint)commands.Count);
             foreach (int cmd in commands)
             {
-                _dataWriter.WriteInt32(cmd);
+                _writer.Write(cmd);
             }
         }
 
         public void SerializeUnary(IList<int> commands)
         {
-            _dataWriter.WriteUInt32((uint)commands.Count);
+            _writer.Write((uint)commands.Count);
             foreach (int cmd in commands)
             {
-                _dataWriter.WriteInt32(cmd);
+                _writer.Write(cmd);
             }
         }
 
         public void SerializeBinary(int command)
         {
-            _dataWriter.WriteInt32(command);
+            _writer.Write(command);
         }
 
         public void SerializeParentheses(int command)
         {
-            _dataWriter.WriteInt32(command);
+            _writer.Write(command);
         }
     }
 }

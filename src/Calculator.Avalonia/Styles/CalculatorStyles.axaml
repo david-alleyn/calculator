@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Port of Calculator's App.xaml button styles and brushes (Standard mode subset).
+  Avalonia styles inherit through class selectors: a button carries several
+  classes, e.g. Classes="CalcButton NumericButtonStyle24".
+
+  The calc button fills follow the UWP App.xaml theme dictionaries: the base
+  color stays #FFFFFF in both variants, but dark mode uses low opacities so the
+  keypad reads as dark gray over the dark background. They are looked up with
+  DynamicResource so the variant switch takes effect.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:CalculatorApp.Avalonia.Controls">
+
+    <Styles.Resources>
+        <ResourceDictionary>
+            <FontFamily x:Key="CalculatorFontFamily">avares://Calculator.Avalonia/Assets/CalculatorIcons.ttf#Calculator Fluent Icons</FontFamily>
+
+            <x:Double x:Key="CalcOperatorCaptionSize">14</x:Double>
+            <x:Double x:Key="CalcButtonCaptionSize">34</x:Double>
+
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="CalcButtonFillColorDefaultBrush" Color="#FFFFFF" Opacity="1" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorHoverBrush" Color="#FFFFFF" Opacity="0.75" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorPressedBrush" Color="#FFFFFF" Opacity="0.5" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorDisabledBrush" Color="#FFFFFF" Opacity="0.125" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorDefaultBrush" Color="#FFFFFF" Opacity="0.5" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorHoverBrush" Color="#FFFFFF" Opacity="0.25" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorPressedBrush" Color="#FFFFFF" Opacity="0.125" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorDisabledBrush" Color="#FFFFFF" Opacity="0.125" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="CalcButtonFillColorDefaultBrush" Color="#FFFFFF" Opacity="1" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorHoverBrush" Color="#FFFFFF" Opacity="0.75" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorPressedBrush" Color="#FFFFFF" Opacity="0.5" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorDisabledBrush" Color="#FFFFFF" Opacity="0.125" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorDefaultBrush" Color="#FFFFFF" Opacity="0.5" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorHoverBrush" Color="#FFFFFF" Opacity="0.25" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorPressedBrush" Color="#FFFFFF" Opacity="0.125" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorDisabledBrush" Color="#FFFFFF" Opacity="0.125" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="CalcButtonFillColorDefaultBrush" Color="#FFFFFF" Opacity="0.125" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorHoverBrush" Color="#FFFFFF" Opacity="0.0852" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorPressedBrush" Color="#FFFFFF" Opacity="0.0359" />
+                    <SolidColorBrush x:Key="CalcButtonFillColorDisabledBrush" Color="#FFFFFF" Opacity="0.0359" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorDefaultBrush" Color="#FFFFFF" Opacity="0.0852" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorHoverBrush" Color="#FFFFFF" Opacity="0.1256" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorPressedBrush" Color="#FFFFFF" Opacity="0.0852" />
+                    <SolidColorBrush x:Key="CalcButtonAltFillColorDisabledBrush" Color="#FFFFFF" Opacity="0.0359" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- Base style for calc buttons (port of CalcButtonStyle). -->
+    <Style Selector="c|CalculatorButton.CalcButton">
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="12" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="{StaticResource CalcButtonCaptionSize}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CalcButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CalcButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonFillColorHoverBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CalcButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonFillColorPressedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CalcButton:disabled">
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CalcButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonFillColorDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+    </Style>
+
+    <!-- Numeric button size classes (port of NumericButtonStyle + size variants). -->
+    <Style Selector="c|CalculatorButton.NumericButtonStyle10"> <Setter Property="FontSize" Value="10" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle12"> <Setter Property="FontSize" Value="12" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle14"> <Setter Property="FontSize" Value="14" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle16"> <Setter Property="FontSize" Value="16" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle18"> <Setter Property="FontSize" Value="18" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle24"> <Setter Property="FontSize" Value="24" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle28"> <Setter Property="FontSize" Value="28" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle34"> <Setter Property="FontSize" Value="34" /> </Style>
+    <Style Selector="c|CalculatorButton.NumericButtonStyle38"> <Setter Property="FontSize" Value="38" /> </Style>
+
+    <!-- Operator / symbol button classes. -->
+    <Style Selector="c|CalculatorButton.OperatorButton">
+        <Setter Property="FontSize" Value="{StaticResource CalcOperatorCaptionSize}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.OperatorButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.OperatorButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.OperatorButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorPressedBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.OperatorButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDisabledBrush}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.SymbolOperatorButton">
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.SymbolOperatorKeypadButton">
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource CalcOperatorCaptionSize}" />
+    </Style>
+
+    <!-- Accent equal button (port of AccentEmphasizedCalcButtonStyle). -->
+    <Style Selector="c|CalculatorButton.AccentEmphasizedCalcButton">
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="12" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource CalcOperatorCaptionSize}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.AccentEmphasizedCalcButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.AccentEmphasizedCalcButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.AccentEmphasizedCalcButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPressed}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextOnAccentButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.AccentEmphasizedCalcButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextOnAccentButtonBackgroundDisabled}" />
+    </Style>
+
+    <!-- Memory caption buttons (port of CaptionButtonStyle). -->
+    <Style Selector="c|CalculatorButton.CaptionButton, Button.CaptionButton">
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CaptionButton:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.CaptionButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CaptionButton:pressed /template/ ContentPresenter#PART_ContentPresenter, Button.CaptionButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+    </Style>
+
+    <Style Selector="c|CalculatorButton.CaptionButton:disabled, Button.CaptionButton:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+    </Style>
+
+    <!-- Navigation access-key hints (shown while Alt is held). -->
+    <Style Selector="TextBlock.AccessKeyHint">
+        <Setter Property="IsVisible" Value="False" />
+        <Setter Property="Margin" Value="8,0,0,0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
+    <Style Selector="Border.AccessKeyHintsVisible TextBlock.AccessKeyHint">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Settings entry in the navigation pane footer. -->
+    <Style Selector="Button.SettingsNavButton">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.SettingsNavButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="Button.SettingsNavButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+    </Style>
+
+    <!-- Transparent toolbar buttons (hamburger, history, keep-on-top).
+         FontSize keeps the icon glyphs scaled to the 40px buttons (the UWP
+         icon buttons use a 16px glyph in a 32px button). -->
+    <Style Selector="Button.ToolbarButtonStyle">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.ToolbarButtonStyle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="Button.ToolbarButtonStyle:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+    </Style>
+
+    <Style Selector="Button.ToolbarButtonStyle:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+    </Style>
+
+    <!-- Clear all history/memory button. -->
+    <Style Selector="Button.ClearAllHistoryMemoryButtonStyle">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="Button.ClearAllHistoryMemoryButtonStyle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="Button.ClearAllHistoryMemoryButtonStyle:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+    </Style>
+
+    <!-- Per-item memory buttons (MC/M+/M- under each memory slot). -->
+    <Style Selector="Button.CaptionMemoryItemButtonStyle">
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+    </Style>
+
+    <Style Selector="Button.CaptionMemoryItemButtonStyle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+    </Style>
+
+    <Style Selector="Button.CaptionMemoryItemButtonStyle:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <!-- Trigonometry / Function panel buttons (port of OperatorPanelButtonStyle). -->
+    <Style Selector="Button.OperatorPanelButton">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.OperatorPanelButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.OperatorPanelButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorPressedBrush}" />
+    </Style>
+
+    <!-- Shift / hyp toggle buttons (port of the CaptionToggle styles). -->
+    <Style Selector="ToggleButton.CalcToggle">
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="12" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource CalcOperatorCaptionSize}" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:checked">
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
+    </Style>
+
+    <!-- Programmer radix rows (port of ProgModeRadioButtonStyle). -->
+    <Style Selector="RadioButton.RadixRow">
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RadioButton">
+                <Grid Background="Transparent">
+                    <Border x:Name="CheckedBar"
+                            Width="3"
+                            Margin="0,3"
+                            CornerRadius="2"
+                            HorizontalAlignment="Left"
+                            Background="{DynamicResource AccentButtonBackground}"
+                            IsVisible="False" />
+                    <ContentPresenter Margin="8,0,6,0"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="RadioButton.RadixRow:checked /template/ Border#CheckedBar">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Full keypad / bit flip toggle. -->
+    <Style Selector="RadioButton.KeypadModeToggle">
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RadioButton">
+                <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Content}"
+                                      Foreground="{TemplateBinding Foreground}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="RadioButton.KeypadModeToggle:checked">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+    </Style>
+
+    <!-- Programmer word-size selector. -->
+    <Style Selector="Button.ProgWordSizeButton">
+        <Setter Property="MinWidth" Value="88" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- Bit-flip toggles (port of FlippingToggleButtonStyle). -->
+    <Style Selector="ToggleButton.BitFlip">
+        <Setter Property="MinWidth" Value="12" />
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip:checked">
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.BitFlipLabel">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
+    <!-- Docked panel tab headers (port of the pivot header used for History/Memory). -->
+    <Style Selector="TabItem.DockPivotTabItem">
+        <Setter Property="Height" Value="48" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
+    <Style Selector="TabItem.DockPivotTabItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+    </Style>
+
+    <Style Selector="TabItem.DockPivotTabItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+    </Style>
+
+</Styles>

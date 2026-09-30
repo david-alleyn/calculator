@@ -106,6 +106,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
+    <Compile Remove="Platform\Linux\**\*.cs" />
     <EmbeddedResource Include="Properties\Calculator.ViewModels.rd.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,80 @@
+# Flatpak manifest for the Avalonia Linux Calculator.
+#
+# Build with:
+#   flatpak-builder --user --force-clean --install-deps-from=flathub \
+#       _build packaging/flatpak/io.github.david_alleyn.calculator.yml
+#   flatpak-builder --user --run \
+#       _build packaging/flatpak/io.github.david_alleyn.calculator.yml calculator
+#
+# The .NET 10 SDK extension and offline NuGet package list let the build run
+# without network access inside the sandbox. The offline sources are generated
+# locally (see the packaging notes in the migration plan):
+#   dotnet restore src/Calculator.Avalonia/Calculator.Avalonia.csproj \
+#       --packages /tmp/nuget-pkgs -r linux-x64
+# then emit packaging/flatpak/nuget-sources.json from the *.nupkg.sha512 set.
+app-id: io.github.david_alleyn.calculator
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.dotnet10
+
+build-options:
+  prepend-path: /usr/lib/sdk/dotnet10/bin
+  append-ld-library-path: /usr/lib/sdk/dotnet10/lib
+
+command: calculator
+
+finish-args:
+  # Avalonia's Linux backend is X11 today (Wayland support is still
+  # experimental), so grant the X11 socket; XWayland covers Wayland sessions.
+  - --socket=x11
+  - --share=ipc
+  - --device=dri
+  - --env=DOTNET_ROOT=/app/lib/dotnet
+
+modules:
+  # Install the shared .NET runtime into /app/lib/dotnet from the SDK extension.
+  - name: dotnet-runtime
+    buildsystem: simple
+    build-commands:
+      - /usr/lib/sdk/dotnet10/bin/install.sh
+
+  - name: calculator
+    buildsystem: simple
+    build-options:
+      env:
+        DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+        DOTNET_NOLOGO: '1'
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
+    build-commands:
+      # Native engine + C ABI shim (skips the C++ test harness).
+      - cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_NATIVE_TESTS=OFF
+      - cmake --build build/cmake
+
+      # Framework-dependent app publish against the installed runtime, using the
+      # offline NuGet cache only. Deterministic source paths and no debug
+      # symbols keep the build directory out of the shipped assemblies.
+      - dotnet publish src/Calculator.Avalonia/Calculator.Avalonia.csproj
+        -c Release -r linux-x64 --no-self-contained
+        -p:ContinuousIntegrationBuild=true -p:DebugType=None -p:DebugSymbols=false
+        -o /app/lib/calculator --source nuget-sources
+
+      # Native library beside the app.
+      - install -Dm755 build/cmake/src/CalcManager.Interop/libCalculatorNative.so /app/lib/calculator/libCalculatorNative.so
+
+      # Engine/view resource catalogs (resw packed as-is; resolved by the launcher).
+      - mkdir -p /app/share/calculator/resources
+      - cp -r src/Calculator/Resources/. /app/share/calculator/resources/
+
+      # Launcher, desktop entry, icon, and AppStream metadata.
+      - install -Dm755 packaging/calculator-launcher.sh /app/bin/calculator
+      - install -Dm644 packaging/io.github.david_alleyn.calculator.desktop /app/share/applications/io.github.david_alleyn.calculator.desktop
+      - install -Dm644 packaging/icons/io.github.david_alleyn.calculator.svg /app/share/icons/hicolor/scalable/apps/io.github.david_alleyn.calculator.svg
+      - install -Dm644 packaging/io.github.david_alleyn.calculator.metainfo.xml /app/share/metainfo/io.github.david_alleyn.calculator.metainfo.xml
+    sources:
+      - type: git
+        url: https://github.com/david-alleyn/calculator.git
+        # Pin to the tagged release that contains the packaging/ directory.
+        tag: v0.0.1
+      - nuget-sources.json

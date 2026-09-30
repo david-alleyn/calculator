@@ -1,0 +1,56 @@
+# Maintainer: David Alleyn <david.alleyn@gmail.com>
+#
+# Builds the Avalonia Linux Calculator from source: the native CalcManager
+# engine (CMake) plus the .NET app (self-contained publish).
+
+pkgname=calculator-avalonia
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="Windows Calculator ported to Linux with Avalonia"
+arch=('x86_64')
+url="https://github.com/david-alleyn/calculator"
+license=('MIT')
+
+# Self-contained publish bundles the .NET runtime, so no dotnet runtime dep.
+depends=('glibc')
+# python is used at build time by the resw->resx localization step.
+makedepends=('git' 'dotnet-sdk' 'cmake' 'ninja' 'clang' 'python')
+
+source=("${pkgname}::git+${url}.git")
+sha256sums=('SKIP')
+
+build() {
+  cd "$pkgname"
+
+  # Native engine + C ABI shim (no C++ test harness in the package build).
+  cmake -S . -B build/cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_NATIVE_TESTS=OFF
+  cmake --build build/cmake
+
+  # Self-contained app publish (bundles the .NET runtime). Deterministic
+  # source paths and no debug symbols keep the build directory out of the
+  # shipped assemblies.
+  dotnet publish src/Calculator.Avalonia/Calculator.Avalonia.csproj \
+    -c Release -r linux-x64 --self-contained true \
+    -p:ContinuousIntegrationBuild=true -p:DebugType=None -p:DebugSymbols=false \
+    -o build/publish
+}
+
+package() {
+  cd "$pkgname"
+
+  install -d "$pkgdir/usr/lib/calculator"
+  install -m755 build/publish/* "$pkgdir/usr/lib/calculator/"
+  install -m755 build/cmake/src/CalcManager.Interop/libCalculatorNative.so \
+    "$pkgdir/usr/lib/calculator/libCalculatorNative.so"
+
+  install -d "$pkgdir/usr/share/calculator/resources"
+  cp -r src/Calculator/Resources/. "$pkgdir/usr/share/calculator/resources/"
+
+  install -Dm755 packaging/calculator-launcher.sh "$pkgdir/usr/bin/calculator"
+  install -Dm644 packaging/io.github.david_alleyn.calculator.desktop \
+    "$pkgdir/usr/share/applications/io.github.david_alleyn.calculator.desktop"
+  install -Dm644 packaging/icons/io.github.david_alleyn.calculator.svg \
+    "$pkgdir/usr/share/icons/hicolor/scalable/apps/io.github.david_alleyn.calculator.svg"
+  install -Dm644 packaging/io.github.david_alleyn.calculator.metainfo.xml \
+    "$pkgdir/usr/share/metainfo/io.github.david_alleyn.calculator.metainfo.xml"
+}

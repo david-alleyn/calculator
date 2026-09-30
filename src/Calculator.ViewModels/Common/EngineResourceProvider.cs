@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#if WINDOWS_UWP
 using Windows.ApplicationModel.Resources;
+#endif
 
 namespace CalculatorApp.ViewModel.Common
 {
@@ -12,10 +14,13 @@ namespace CalculatorApp.ViewModel.Common
     /// </summary>
     internal class EngineResourceProvider
     {
+#if WINDOWS_UWP
         private ResourceLoader _resLoader;
+#endif
 
         public EngineResourceProvider()
         {
+#if WINDOWS_UWP
             try
             {
                 _resLoader = ResourceLoader.GetForViewIndependentUse("CEngineStrings");
@@ -24,6 +29,7 @@ namespace CalculatorApp.ViewModel.Common
             {
                 _resLoader = null;
             }
+#endif
         }
 
         public string GetCEngineString(string id)
@@ -47,7 +53,11 @@ namespace CalculatorApp.ViewModel.Common
                     return localizationSettings.GetNumberGroupingStr();
                 }
 
+#if WINDOWS_UWP
                 return _resLoader?.GetString(id) ?? "";
+#else
+                return ResxResourceCatalog.GetString("CEngineStrings", id, "");
+#endif
             }
             catch
             {

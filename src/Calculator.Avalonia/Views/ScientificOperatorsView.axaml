@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Scientific operators panel (port of CalculatorScientificOperators.xaml).
+  DataContext: StandardCalculatorViewModel. Includes its own number pad, the
+  Trigonometry/Function flyout panel buttons, and the shift (inverse) toggle.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:CalculatorApp.Avalonia.Controls"
+             xmlns:conv="using:CalculatorApp.Avalonia.Converters"
+             x:Class="CalculatorApp.Avalonia.Views.ScientificOperatorsView"
+             x:Name="SciRoot">
+
+    <UserControl.Resources>
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
+        <conv:BooleanNegationConverter x:Key="BooleanNegationConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
+    </UserControl.Resources>
+
+    <Grid
+          RowDefinitions="Auto,*,*,*,*,*,*,*"
+          ColumnDefinitions="*,*,*,*,*">
+
+        <!-- Row 0: Trigonometry / Function panel buttons with flyouts -->
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="5" Orientation="Horizontal" Margin="1">
+            <Button x:Name="TrigButton" Classes="OperatorPanelButton">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock FontFamily="{DynamicResource CalculatorFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="&#xF892;" />
+                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=trigButton.Text}" />
+                    </StackPanel>
+                </Button.Content>
+                <Button.Flyout>
+                    <Flyout Placement="Bottom">
+                        <Grid x:Name="TrigGrid"
+                              MinWidth="258"
+                              MinHeight="96"
+                             
+                              DataContext="{Binding DataContext, ElementName=SciRoot}"
+                              RowDefinitions="*,*"
+                              ColumnDefinitions="*,*,*,*">
+                            <ToggleButton x:Name="TrigShiftButton"
+                                          Grid.Row="0" Grid.Column="0"
+                                          Classes="CalcToggle"
+                                          Content="&#xF897;"
+                                          Click="TrigToggle_Toggle" />
+                            <ToggleButton x:Name="HypButton"
+                                          Grid.Row="1" Grid.Column="0"
+                                          Classes="CalcToggle"
+                                          Content="hyp"
+                                          Click="TrigToggle_Toggle" />
+
+                            <Grid x:Name="TrigFunctions"
+                                  Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                  RowDefinitions="*,*" ColumnDefinitions="*,*,*">
+                                <c:CalculatorButton x:Name="SinButton" Grid.Row="0" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sin" ButtonId="Sin" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="cos" ButtonId="Cos" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="tan" ButtonId="Tan" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sec" ButtonId="Sec" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="csc" ButtonId="Csc" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="cot" ButtonId="Cot" Click="FlyoutButton_Clicked" />
+                            </Grid>
+
+                            <Grid x:Name="InverseTrigFunctions"
+                                  Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                  IsVisible="False"
+                                  RowDefinitions="*,*" ColumnDefinitions="*,*,*">
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sin⁻¹" ButtonId="InvSin" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="cos⁻¹" ButtonId="InvCos" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="tan⁻¹" ButtonId="InvTan" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sec⁻¹" ButtonId="InvSec" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="csc⁻¹" ButtonId="InvCsc" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="cot⁻¹" ButtonId="InvCot" Click="FlyoutButton_Clicked" />
+                            </Grid>
+
+                            <Grid x:Name="HyperbolicTrigFunctions"
+                                  Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                  IsVisible="False"
+                                  RowDefinitions="*,*" ColumnDefinitions="*,*,*">
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sinh" ButtonId="Sinh" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="cosh" ButtonId="Cosh" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="tanh" ButtonId="Tanh" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sech" ButtonId="Sech" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="csch" ButtonId="Csch" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="coth" ButtonId="Coth" Click="FlyoutButton_Clicked" />
+                            </Grid>
+
+                            <Grid x:Name="InverseHyperbolicTrigFunctions"
+                                  Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                  IsVisible="False"
+                                  RowDefinitions="*,*" ColumnDefinitions="*,*,*">
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sinh⁻¹" ButtonId="InvSinh" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="cosh⁻¹" ButtonId="InvCosh" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="0" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="tanh⁻¹" ButtonId="InvTanh" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="sech⁻¹" ButtonId="InvSech" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="1" Classes="CalcButton OperatorButton" FontSize="14" Content="csch⁻¹" ButtonId="InvCsch" Click="FlyoutButton_Clicked" />
+                                <c:CalculatorButton Grid.Row="1" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="coth⁻¹" ButtonId="InvCoth" Click="FlyoutButton_Clicked" />
+                            </Grid>
+                        </Grid>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button x:Name="FuncButton" Classes="OperatorPanelButton">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock FontFamily="{DynamicResource CalculatorFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="&#xF893;" />
+                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=funcButton.Text}" />
+                    </StackPanel>
+                </Button.Content>
+                <Button.Flyout>
+                    <Flyout Placement="Bottom">
+                        <Grid x:Name="FuncGrid"
+                              MinWidth="194"
+                              MinHeight="96"
+                             
+                              DataContext="{Binding DataContext, ElementName=SciRoot}"
+                              RowDefinitions="*,*" ColumnDefinitions="*,*,*">
+                            <c:CalculatorButton Grid.Row="0" Grid.Column="0" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF884;" ButtonId="Abs" Click="FlyoutButton_Clicked" />
+                            <c:CalculatorButton Grid.Row="0" Grid.Column="1" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF885;" ButtonId="Floor" Click="FlyoutButton_Clicked" />
+                            <c:CalculatorButton Grid.Row="0" Grid.Column="2" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF886;" ButtonId="Ceil" Click="FlyoutButton_Clicked" />
+                            <c:CalculatorButton Grid.Row="1" Grid.Column="0" Classes="CalcButton OperatorButton" FontSize="14" Content="rand" ButtonId="Rand" Click="FlyoutButton_Clicked" />
+                            <c:CalculatorButton Grid.Row="1" Grid.Column="1" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF890;" ButtonId="DMS" Click="FlyoutButton_Clicked" />
+                            <c:CalculatorButton Grid.Row="1" Grid.Column="2" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF891;" ButtonId="Degrees" Click="FlyoutButton_Clicked" />
+                        </Grid>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </StackPanel>
+
+        <!-- Row 1: shift, pi, e, CE/C, backspace -->
+        <ToggleButton x:Name="ShiftButton"
+                      Grid.Row="1" Grid.Column="0"
+                      Classes="CalcToggle"
+                      Content="&#xF897;"
+                      Click="ShiftButton_Check" />
+        <c:CalculatorButton x:Name="PiButton"
+                            Grid.Row="1" Grid.Column="1"
+                            Classes="CalcButton OperatorButton SymbolOperatorButton"
+                            Content="&#xf7cf;"
+                            ButtonId="Pi" />
+        <c:CalculatorButton x:Name="EulerButton"
+                            Grid.Row="1" Grid.Column="2"
+                            Classes="CalcButton OperatorButton"
+                            Content="e"
+                            ButtonId="Euler" />
+        <c:CalculatorButton x:Name="ClearEntryButton"
+                            Grid.Row="1" Grid.Column="3"
+                            Classes="CalcButton OperatorButton"
+                            FontSize="16"
+                            Content="CE"
+                            ButtonId="ClearEntry"
+                            IsVisible="{Binding IsInputEmpty, Converter={StaticResource BooleanToVisibilityNegationConverter}}" />
+        <c:CalculatorButton x:Name="ClearButton"
+                            Grid.Row="1" Grid.Column="3"
+                            Classes="CalcButton OperatorButton"
+                            FontSize="16"
+                            Content="C"
+                            ButtonId="Clear"
+                            IsVisible="{Binding IsInputEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <c:CalculatorButton x:Name="BackSpaceButton"
+                            Grid.Row="1" Grid.Column="4"
+                            Classes="CalcButton OperatorButton SymbolOperatorButton"
+                            FontSize="16"
+                            Content="&#xE94F;"
+                            ButtonId="Backspace" />
+
+        <!-- Advanced function column (rows 2-7, col 0), toggled by shift -->
+        <Grid Grid.Row="2" Grid.RowSpan="6" Grid.Column="0">
+            <Grid x:Name="Row1" RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="*">
+                <c:CalculatorButton x:Name="XPower2Button" Grid.Row="0" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xf7c8;" ButtonId="XPower2" />
+                <c:CalculatorButton x:Name="SquareRootButton" Grid.Row="1" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF899;" ButtonId="Sqrt" />
+                <c:CalculatorButton x:Name="PowerButton" Grid.Row="2" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xf7ca;" ButtonId="XPowerY" />
+                <c:CalculatorButton x:Name="PowerOf10Button" Grid.Row="3" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF7CC;" ButtonId="TenPowerX" />
+                <c:CalculatorButton x:Name="LogBase10Button" Grid.Row="4" Classes="CalcButton OperatorButton" FontSize="14" Content="log" ButtonId="LogBase10" />
+                <c:CalculatorButton x:Name="LogBaseEButton" Grid.Row="5" Classes="CalcButton OperatorButton" FontSize="14" Content="ln" ButtonId="LogBaseE" />
+            </Grid>
+            <Grid x:Name="InvRow1" IsVisible="False" RowDefinitions="*,*,*,*,*,*" ColumnDefinitions="*">
+                <c:CalculatorButton x:Name="XPower3Button" Grid.Row="0" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xf7cb;" ButtonId="Cube" />
+                <c:CalculatorButton x:Name="CubeRootButton" Grid.Row="1" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF881;" ButtonId="CubeRoot" />
+                <c:CalculatorButton x:Name="YSquareRootButton" Grid.Row="2" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xf7cd;" ButtonId="YRootX" />
+                <c:CalculatorButton x:Name="TwoPowerXButton" Grid.Row="3" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF882;" ButtonId="TwoPowerX" />
+                <c:CalculatorButton x:Name="LogBaseYButton" Grid.Row="4" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF883;" ButtonId="LogBaseY" />
+                <c:CalculatorButton x:Name="PowerOfEButton" Grid.Row="5" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xf7ce;" ButtonId="EPowerX" />
+            </Grid>
+        </Grid>
+
+        <!-- Row 2: invert, abs, exp, mod -->
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" ColumnDefinitions="*,*,*,*">
+            <c:CalculatorButton x:Name="InvertButton" Grid.Column="0" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xf7c9;" ButtonId="Invert" />
+            <c:CalculatorButton x:Name="AbsButton" Grid.Column="1" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF884;" ButtonId="Abs" />
+            <c:CalculatorButton x:Name="ExpButton" Grid.Column="2" Classes="CalcButton OperatorButton" FontSize="14" Content="exp" ButtonId="Exp" />
+            <c:CalculatorButton x:Name="ModButton" Grid.Column="3" Classes="CalcButton OperatorButton" FontSize="14" Content="mod" ButtonId="Mod" />
+        </Grid>
+
+        <!-- Row 3: parentheses and factorial -->
+        <c:CalculatorButton x:Name="OpenParenthesisButton"
+                            Grid.Row="3" Grid.Column="1"
+                            Classes="CalcButton OperatorButton"
+                            FontSize="19"
+                            Content="("
+                            ButtonId="OpenParenthesis" />
+        <c:CalculatorButton x:Name="CloseParenthesisButton"
+                            Grid.Row="3" Grid.Column="2"
+                            Classes="CalcButton OperatorButton"
+                            FontSize="19"
+                            Content=")"
+                            ButtonId="CloseParenthesis" />
+        <c:CalculatorButton x:Name="FactorialButton"
+                            Grid.Row="3" Grid.Column="3"
+                            Classes="CalcButton OperatorButton SymbolOperatorButton"
+                            FontSize="18"
+                            Content="&#xF887;"
+                            ButtonId="Factorial" />
+
+        <!-- Operator column (rows 3-7) -->
+        <Grid Grid.Row="3" Grid.RowSpan="5" Grid.Column="4" RowDefinitions="*,*,*,*,*" ColumnDefinitions="*">
+            <c:CalculatorButton x:Name="DivideButton" Grid.Row="0" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xE94A;" ButtonId="Divide" />
+            <c:CalculatorButton x:Name="MultiplyButton" Grid.Row="1" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xE947;" ButtonId="Multiply" />
+            <c:CalculatorButton x:Name="MinusButton" Grid.Row="2" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xE949;" ButtonId="Subtract" />
+            <c:CalculatorButton x:Name="PlusButton" Grid.Row="3" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xE948;" ButtonId="Add" />
+            <c:CalculatorButton x:Name="EqualButton" Grid.Row="4" Classes="AccentEmphasizedCalcButton" Content="&#xE94E;" ButtonId="Equals" />
+        </Grid>
+
+        <!-- Number pad (rows 4-7, cols 1-3) -->
+        <Grid Grid.Row="4" Grid.RowSpan="4" Grid.Column="1" Grid.ColumnSpan="3"
+              RowDefinitions="*,*,*,*" ColumnDefinitions="*,*,*">
+            <c:CalculatorButton x:Name="Num7Button" Grid.Row="0" Grid.Column="0" Classes="CalcButton NumericButtonStyle24" Content="7" ButtonId="Seven" />
+            <c:CalculatorButton x:Name="Num8Button" Grid.Row="0" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="8" ButtonId="Eight" />
+            <c:CalculatorButton x:Name="Num9Button" Grid.Row="0" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="9" ButtonId="Nine" />
+            <c:CalculatorButton x:Name="Num4Button" Grid.Row="1" Grid.Column="0" Classes="CalcButton NumericButtonStyle24" Content="4" ButtonId="Four" />
+            <c:CalculatorButton x:Name="Num5Button" Grid.Row="1" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="5" ButtonId="Five" />
+            <c:CalculatorButton x:Name="Num6Button" Grid.Row="1" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="6" ButtonId="Six" />
+            <c:CalculatorButton x:Name="Num1Button" Grid.Row="2" Grid.Column="0" Classes="CalcButton NumericButtonStyle24" Content="1" ButtonId="One" />
+            <c:CalculatorButton x:Name="Num2Button" Grid.Row="2" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="2" ButtonId="Two" />
+            <c:CalculatorButton x:Name="Num3Button" Grid.Row="2" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="3" ButtonId="Three" />
+            <c:CalculatorButton x:Name="NegateButton" Grid.Row="3" Grid.Column="0" Classes="CalcButton SymbolOperatorKeypadButton" FontSize="16" Content="&#xF898;" ButtonId="Negate" IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
+            <c:CalculatorButton x:Name="Num0Button" Grid.Row="3" Grid.Column="1" Classes="CalcButton NumericButtonStyle24" Content="0" ButtonId="Zero" />
+            <c:CalculatorButton x:Name="DecimalSeparatorButton" Grid.Row="3" Grid.Column="2" Classes="CalcButton NumericButtonStyle24" Content="." ButtonId="Decimal" IsEnabled="{Binding IsDecimalEnabled}" />
+        </Grid>
+    </Grid>
+</UserControl>

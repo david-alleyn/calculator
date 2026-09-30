@@ -1,10 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#if WINDOWS_UWP
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls;
 
+#else
+
+using System;
+
+#endif
+
+
+#if WINDOWS_UWP
 namespace CalculatorApp.ViewModel.Common.Automation
 {
     public sealed class NarratorNotifier : DependencyObject
@@ -74,3 +84,37 @@ namespace CalculatorApp.ViewModel.Common.Automation
         }
     }
 }
+
+#else
+
+using System;
+
+namespace CalculatorApp.ViewModel.Common.Automation
+{
+    // UI automation notifications are not supported on Linux yet. The
+    // announcement plumbing stays so callers need no changes; the notifier
+    // only stores the latest announcement.
+    public sealed class NarratorNotifier
+    {
+        public NarratorAnnouncement Announcement { get; set; }
+
+        public void Announce(NarratorAnnouncement announcement)
+        {
+            if (NarratorAnnouncement.IsValid(announcement))
+            {
+                Announcement = announcement;
+            }
+        }
+
+        public static void RegisterDependencyProperties()
+        {
+        }
+
+        public static NarratorAnnouncement GetAnnouncement(object element)
+        {
+            return null;
+        }
+    }
+}
+#endif
+

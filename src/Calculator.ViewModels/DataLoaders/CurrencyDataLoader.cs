@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using CalculatorApp.ViewModel.Common;
-using Windows.Data.Json;
+using System.Text.Json;
 using Windows.Globalization.DateTimeFormatting;
 using Windows.Globalization.NumberFormatting;
 using Windows.Storage;
@@ -146,6 +146,12 @@ namespace CalculatorApp.ViewModel.DataLoaders
         {
             bool notified = false;
             await _loadGate.WaitAsync().ConfigureAwait(false);
+#if !WINDOWS_UWP
+            // On Linux the mock web responses complete synchronously; yield once
+            // so the initial state (data not yet loaded) is observable, matching
+            // the UWP behavior where loading always crosses the UI dispatcher.
+            await Task.Delay(50).ConfigureAwait(false);
+#endif
             try
             {
                 if (LoadGateEnteredForTest != null)
@@ -579,22 +585,32 @@ namespace CalculatorApp.ViewModel.DataLoaders
         {
             staticData = new List<CurrencyStaticData>();
 
-            if (!JsonArray.TryParse(rawJson, out JsonArray data))
+            if (string.IsNullOrEmpty(rawJson))
             {
                 return false;
             }
 
-            for (uint i = 0; i < data.Count; i++)
+            JsonElement data;
+            try
+            {
+                data = JsonDocument.Parse(rawJson).RootElement;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
+
+            foreach (JsonElement item in data.EnumerateArray())
             {
                 try
                 {
-                    JsonObject obj = data[(int)i].GetObject();
+                    JsonElement obj = item;
 
-                    string countryCode = obj.GetNamedString(StaticDataProperties[0]);
-                    string countryName = obj.GetNamedString(StaticDataProperties[1]);
-                    string currencyCode = obj.GetNamedString(StaticDataProperties[2]);
-                    string currencyName = obj.GetNamedString(StaticDataProperties[3]);
-                    string currencySymbol = obj.GetNamedString(StaticDataProperties[4]);
+                    string countryCode = obj.GetProperty(StaticDataProperties[0]).GetString();
+                    string countryName = obj.GetProperty(StaticDataProperties[1]).GetString();
+                    string currencyCode = obj.GetProperty(StaticDataProperties[2]).GetString();
+                    string currencyName = obj.GetProperty(StaticDataProperties[3]).GetString();
+                    string currencySymbol = obj.GetProperty(StaticDataProperties[4]).GetString();
 
                     staticData.Add(new CurrencyStaticData
                     {
@@ -621,21 +637,31 @@ namespace CalculatorApp.ViewModel.DataLoaders
         {
             allRatios = new Dictionary<string, CurrencyRatio>();
 
-            if (!JsonArray.TryParse(rawJson, out JsonArray data))
+            if (string.IsNullOrEmpty(rawJson))
+            {
+                return false;
+            }
+
+            JsonElement data;
+            try
+            {
+                data = JsonDocument.Parse(rawJson).RootElement;
+            }
+            catch (JsonException)
             {
                 return false;
             }
 
             string sourceCurrencyCode = DefaultCurrencyCode;
 
-            for (uint i = 0; i < data.Count; i++)
+            foreach (JsonElement item in data.EnumerateArray())
             {
                 try
                 {
-                    JsonObject obj = data[(int)i].GetObject();
+                    JsonElement obj = item;
 
-                    double relativeRatio = obj.GetNamedNumber(RatioKey);
-                    string targetCurrencyCode = obj.GetNamedString(CurrencyCodeKey);
+                    double relativeRatio = obj.GetProperty(RatioKey).GetDouble();
+                    string targetCurrencyCode = obj.GetProperty(CurrencyCodeKey).GetString();
 
                     allRatios[targetCurrencyCode] = new CurrencyRatio
                     {
@@ -815,15 +841,12 @@ namespace CalculatorApp.ViewModel.DataLoaders
                 if (defaultFromToCurrencyFile != null)
                 {
                     string fileContents = await FileIO.ReadTextAsync(defaultFromToCurrencyFile);
-                    JsonObject fromToObject = JsonObject.Parse(fileContents);
+                    JsonElement fromToObject = JsonDocument.Parse(fileContents).RootElement;
 
-                    if (fromToObject.ContainsKey(_responseLanguage))
+                    if (fromToObject.TryGetProperty(_responseLanguage, out JsonElement regionalDefaults))
                     {
-                        JsonObject regionalDefaults = fromToObject.GetNamedObject(_responseLanguage);
-                        string selectedFrom = regionalDefaults.GetNamedString(FromKey);
-                        string selectedTo = regionalDefaults.GetNamedString(ToKey);
-                        fromCurrency = selectedFrom;
-                        toCurrency = selectedTo;
+                        fromCurrency = regionalDefaults.GetProperty(FromKey).GetString();
+                        toCurrency = regionalDefaults.GetProperty(ToKey).GetString();
                     }
                 }
             }
