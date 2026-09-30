@@ -75,7 +75,6 @@ modules:
     sources:
       - type: git
         url: https://github.com/david-alleyn/calculator.git
-        # Pin to the tagged release that contains the packaging/ directory, e.g.
-        #   tag: v0.0.1
-        commit: 558cd62172ccf45606a8e5bdd1f29f8d33181de4
+        # Pin to the tagged release that contains the packaging/ directory.
+        tag: v0.0.1
       - nuget-sources.json
