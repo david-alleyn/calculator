@@ -2,6 +2,7 @@
 
 using System.Linq;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -180,6 +181,47 @@ namespace Calculator.Avalonia.Tests
             Assert.IsFalse(navPane.Classes.Contains("AccessKeyHintsVisible"));
 
             Dispatcher.UIThread.Post(window.Close);
+        }
+    }
+}
+
+namespace Calculator.Avalonia.Tests
+{
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+    public class RtlLayoutTests
+    {
+        [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitialize]
+        public static void ClassInitialize(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext context)
+        {
+            AvaloniaTestHost.EnsureInitialized();
+        }
+
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        public void RtlWindow_DoesNotFlipTheKeypad()
+        {
+            var viewModel = new ApplicationViewModel();
+            viewModel.Initialize(ViewMode.Standard);
+            Window window = null;
+            Dispatcher.UIThread.Post(() =>
+            {
+                window = new MainWindow { DataContext = viewModel };
+                window.FlowDirection = global::Avalonia.Media.FlowDirection.RightToLeft;
+                window.Show();
+            });
+            Dispatcher.UIThread.RunJobs();
+
+            // Culture-driven RTL reaches the shell...
+            var shell = window.GetVisualDescendants().OfType<Grid>().FirstOrDefault(g => g.Name == "AppShellRoot");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(shell);
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(
+                global::Avalonia.Media.FlowDirection.RightToLeft, shell.FlowDirection);
+
+            // ...without flipping the keypad (Avalonia 12 renders RTL text but
+            // does not mirror the layout, and an explicit LTR would flip it).
+            var numpad = window.GetVisualDescendants().OfType<Grid>().FirstOrDefault(g => g.Name == "StandardNumpad");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(numpad);
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(numpad.HasMirrorTransform,
+                "The standard keypad must not be mirrored in RTL.");
         }
     }
 }

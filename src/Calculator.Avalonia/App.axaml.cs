@@ -86,9 +86,16 @@ namespace CalculatorApp.Avalonia
                     }
                 }
 
+                // Right-to-left UI for RTL cultures (Hebrew, Arabic, ...); the
+                // keypads opt back to LTR to keep the digit/operator layout.
+                bool rightToLeft = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = ViewModel,
+                    FlowDirection = rightToLeft
+                        ? global::Avalonia.Media.FlowDirection.RightToLeft
+                        : global::Avalonia.Media.FlowDirection.LeftToRight,
                 };
 
                 // Route the ViewModel clipboard facade to the system clipboard.

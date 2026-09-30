@@ -12,12 +12,13 @@
              x:Name="ProgOpsRoot">
 
     <UserControl.Resources>
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
         <conv:BooleanNegationConverter x:Key="BooleanNegationConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
     </UserControl.Resources>
 
-    <Grid FlowDirection="LeftToRight"
+    <Grid
           RowDefinitions="Auto,*,*,*,*,*,*"
           ColumnDefinitions="*,*,*,*,*,*">
 
@@ -30,7 +31,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="&#xF88C;" />
-                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="Bitwise" />
+                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=bitwiseButton.Text}" />
                     </StackPanel>
                 </Button.Content>
                 <Button.Flyout>
@@ -58,16 +59,16 @@
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="&#xF88D;" />
-                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="Bit shift" />
+                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=bitShiftButton.Text}" />
                     </StackPanel>
                 </Button.Content>
                 <Button.Flyout>
                     <Flyout Placement="Bottom">
                         <StackPanel DataContext="{Binding DataContext, ElementName=ProgOpsRoot}" Spacing="2" MinWidth="160">
-                            <RadioButton x:Name="ArithmeticShiftButton" GroupName="BitShiftMode" Content="Arithmetic shift" Click="ShiftMode_Click" />
-                            <RadioButton x:Name="LogicalShiftButton" GroupName="BitShiftMode" Content="Logical shift" Click="ShiftMode_Click" />
-                            <RadioButton x:Name="RotateCircularButton" GroupName="BitShiftMode" Content="Rotate circular" Click="ShiftMode_Click" />
-                            <RadioButton x:Name="RotateCarryShiftButton" GroupName="BitShiftMode" Content="Rotate carry" Click="ShiftMode_Click" />
+                            <RadioButton x:Name="ArithmeticShiftButton" GroupName="BitShiftMode" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=arithmeticShiftButton.Content}" Click="ShiftMode_Click" />
+                            <RadioButton x:Name="LogicalShiftButton" GroupName="BitShiftMode" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=logicalShiftButton.Content}" Click="ShiftMode_Click" />
+                            <RadioButton x:Name="RotateCircularButton" GroupName="BitShiftMode" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=rotateCircularButton.Content}" Click="ShiftMode_Click" />
+                            <RadioButton x:Name="RotateCarryShiftButton" GroupName="BitShiftMode" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=rotateCarryShiftButton.Content}" Click="ShiftMode_Click" />
                         </StackPanel>
                     </Flyout>
                 </Button.Flyout>

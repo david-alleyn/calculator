@@ -383,10 +383,13 @@ plotting equations with a minimal evaluator (no key-graph features).
   keypad text is no longer white-on-white in dark mode.
 
 **Remaining:**
-- Bump the manifest's pinned commit to a tagged release; RTL (Hebrew/Arabic) verification still
-  needs a bilingual pass (the app does not yet set `FlowDirection` from locale).
-- Several Avalonia views still hardcode UI strings (e.g. "Trigonometry", "Settings", the
-  Date/Converter labels); route them through `AppResourceProvider` next.
+- Bump the manifest's pinned commit to a tagged release.
+- RTL (Hebrew/Arabic): culture-driven `FlowDirection` is now set on the window and localized
+  strings render correctly (verified with Hebrew/Arabic screenshots). Note that Avalonia 12 does
+  not mirror the layout for RTL, so this is text-direction support only; the keypads keep their
+  LTR layout (a view test guards against an accidental mirror flip).
+- The views' UI strings (Settings, Date, the Trigonometry/Function and Bitwise/Bit shift panel
+  buttons, the HEX/DEC/OCT/BIN tags) now resolve through `AppResourceProvider`.
 - The generated `Localization/` folder requires a clean rebuild of dependents when it first
   appears (satellites must land in the consumer's `.deps.json`); a full build always does this.
 

@@ -10,6 +10,7 @@
              x:Name="DateRoot">
 
     <UserControl.Resources>
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
     </UserControl.Resources>
@@ -22,8 +23,8 @@
                   HorizontalAlignment="Left"
                   SelectedIndex="0"
                   SelectionChanged="DateCalculationOption_SelectionChanged">
-            <ComboBoxItem Content="Difference between dates" />
-            <ComboBoxItem Content="Add or subtract days" />
+            <ComboBoxItem Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=Date_DifferenceOption.Content}" />
+            <ComboBoxItem Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=Date_AddSubtractOption.Content}" />
         </ComboBox>
 
         <!-- Difference between two dates -->
@@ -33,7 +34,7 @@
               IsVisible="{Binding IsDateDiffMode}"
               RowDefinitions="Auto,Auto,Auto,Auto,Auto">
             <StackPanel Grid.Row="0" HorizontalAlignment="Left">
-                <TextBlock Text="From" FontSize="12"
+                <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DateDiff_FromHeader.Header}" FontSize="12"
                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                 <CalendarDatePicker x:Name="DateDiff_FromDate"
                                     MinWidth="240"
@@ -41,7 +42,7 @@
                                     SelectedDateChanged="FromDate_SelectedDateChanged" />
             </StackPanel>
             <StackPanel Grid.Row="1" Margin="0,8,0,0" HorizontalAlignment="Left">
-                <TextBlock Text="To" FontSize="12"
+                <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DateDiff_ToHeader.Header}" FontSize="12"
                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                 <CalendarDatePicker x:Name="DateDiff_ToDate"
                                     MinWidth="240"
@@ -52,7 +53,7 @@
             <TextBlock Grid.Row="2"
                        Margin="0,12,0,0"
                        FontSize="12"
-                       Text="Difference"
+                       Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=Date_DifferenceLabel.Text}"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
             <TextBlock x:Name="DateDiffAllUnitsResultLabel"
                        Grid.Row="3"
@@ -76,7 +77,7 @@
               IsVisible="{Binding IsDateDiffMode, Converter={StaticResource BooleanToVisibilityNegationConverter}}"
               RowDefinitions="Auto,Auto,Auto,Auto,Auto">
             <StackPanel Grid.Row="0" HorizontalAlignment="Left">
-                <TextBlock Text="From" FontSize="12"
+                <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=AddSubtract_Date_FromHeader.Header}" FontSize="12"
                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                 <CalendarDatePicker x:Name="AddSubtract_FromDate"
                                     MinWidth="240"
@@ -85,13 +86,13 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Margin="0,12,0,0" Orientation="Horizontal" Spacing="20">
-                <RadioButton x:Name="AddOption" Content="Add" Click="AddOption_Click" />
-                <RadioButton x:Name="SubtractOption" Content="Subtract" Click="SubtractOption_Click" />
+                <RadioButton x:Name="AddOption" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=AddOption.Content}" Click="AddOption_Click" />
+                <RadioButton x:Name="SubtractOption" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=SubtractOption.Content}" Click="SubtractOption_Click" />
             </StackPanel>
 
             <Grid Grid.Row="2" Margin="0,12,0,0" ColumnDefinitions="Auto,Auto,Auto">
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="Years" FontSize="12"
+                    <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=YearsLabel.Text}" FontSize="12"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                     <ComboBox x:Name="YearsValue"
                               MinWidth="84"
@@ -100,7 +101,7 @@
                               SelectedIndex="{Binding YearsOffset, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Margin="12,0">
-                    <TextBlock Text="Months" FontSize="12"
+                    <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=MonthsLabel.Text}" FontSize="12"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                     <ComboBox x:Name="MonthsValue"
                               MinWidth="84"
@@ -109,7 +110,7 @@
                               SelectedIndex="{Binding MonthsOffset, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2">
-                    <TextBlock Text="Days" FontSize="12"
+                    <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DaysLabel.Text}" FontSize="12"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
                     <ComboBox x:Name="DaysValue"
                               MinWidth="84"
@@ -122,7 +123,7 @@
             <TextBlock Grid.Row="3"
                        Margin="0,12,0,0"
                        FontSize="12"
-                       Text="Date"
+                       Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DateLabel.Text}"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
             <TextBlock x:Name="DateResultLabel"
                        Grid.Row="4"

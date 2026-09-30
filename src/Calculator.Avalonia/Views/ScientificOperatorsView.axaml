@@ -12,12 +12,13 @@
              x:Name="SciRoot">
 
     <UserControl.Resources>
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
         <conv:BooleanNegationConverter x:Key="BooleanNegationConverter" />
         <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
     </UserControl.Resources>
 
-    <Grid FlowDirection="LeftToRight"
+    <Grid
           RowDefinitions="Auto,*,*,*,*,*,*,*"
           ColumnDefinitions="*,*,*,*,*">
 
@@ -30,7 +31,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="&#xF892;" />
-                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="Trigonometry" />
+                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=trigButton.Text}" />
                     </StackPanel>
                 </Button.Content>
                 <Button.Flyout>
@@ -38,7 +39,7 @@
                         <Grid x:Name="TrigGrid"
                               MinWidth="258"
                               MinHeight="96"
-                              FlowDirection="LeftToRight"
+                             
                               DataContext="{Binding DataContext, ElementName=SciRoot}"
                               RowDefinitions="*,*"
                               ColumnDefinitions="*,*,*,*">
@@ -111,7 +112,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="&#xF893;" />
-                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="Function" />
+                        <TextBlock FontSize="12" VerticalAlignment="Center" Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=funcButton.Text}" />
                     </StackPanel>
                 </Button.Content>
                 <Button.Flyout>
@@ -119,7 +120,7 @@
                         <Grid x:Name="FuncGrid"
                               MinWidth="194"
                               MinHeight="96"
-                              FlowDirection="LeftToRight"
+                             
                               DataContext="{Binding DataContext, ElementName=SciRoot}"
                               RowDefinitions="*,*" ColumnDefinitions="*,*,*">
                             <c:CalculatorButton Grid.Row="0" Grid.Column="0" Classes="CalcButton OperatorButton SymbolOperatorButton" Content="&#xF884;" ButtonId="Abs" Click="FlyoutButton_Clicked" />
