@@ -4,15 +4,17 @@ This document describes the plan to migrate Windows Calculator from its current 
 [AvaloniaUI](https://avaloniaui.net/) so that it can run on Linux. It also covers
 the platform-neutralization work required in the ViewModel and native engine layers.
 
-**Status:** Phases 0-2 complete (Standard-mode Linux app is runnable and engine-driven);
-Phases 3-4 optional; Phase 5 in progress. The engine builds and passes its tests on Linux via
-CMake/ctest, the C ABI shim (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0
-through source-generated P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests
-against the native engine). The `src/Calculator.Avalonia` app provides the app shell, Standard
-calculator view, and history/memory panes (docked ↔ flyout) with light/dark theming, verified by
-a headless view test suite (7/7). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging
-manifests (validated with real `flatpak-builder` and `makepkg` runs), and a resw→resx
-localization pipeline. Key decisions are recorded in [Decisions](#decisions).
+**Status:** Phases 0-2 complete; Phase 3 complete for every non-graphing mode (Scientific,
+Programmer, Date, Unit Converter) plus Settings and mode accelerators, with a few follow-ups
+tracked in that section; Phase 4 optional and not started; Phase 5 in progress. The engine
+builds and passes its tests on Linux via CMake/ctest, the C ABI shim
+(`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0 through source-generated
+P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests against the native engine).
+The `src/Calculator.Avalonia` app provides the app shell, all non-graphing mode views, and
+history/memory panes (docked ↔ flyout) with light/dark theming, verified by a headless view test
+suite (31/31). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging manifests (validated
+with real `flatpak-builder` and `makepkg` runs), and a resw→resx localization pipeline. Key
+decisions are recorded in [Decisions](#decisions).
 
 ---
 
@@ -245,7 +247,7 @@ history-expression glyph serialization bug and the high-contrast variant.*
 *Optional: the app is fully usable with Standard mode; this phase extends coverage to every
 non-graphing mode.*
 
-**Progress (in progress):**
+**Progress (complete, with follow-ups):**
 - Scientific mode is ported and navigable. `ScientificOperatorsView` mirrors
   `CalculatorScientificOperators.xaml`: the Trigonometry/Function flyout panel buttons (with the
   shift/hyp sub-grid switching), the main shift toggle that swaps the advanced function column
@@ -272,11 +274,12 @@ non-graphing mode.*
 - `CalculatorView` overlays the Standard/Scientific/Programmer keypads by mode; the shell swaps
   in `DateCalculatorView`/`UnitConverterView` for their modes and enables the
   Scientific/Programmer/Date/converter navigation items.
-- Verified: 26/26 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
+- Verified: 31/31 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
   shift/inverse cube, sin(30°)=0.5 via flyout; Programmer: panel switching, hex conversion,
   bit-flip, word-size cycling, AND; Date: view switching, date difference, add/subtract with
-  offsets; Converter: view switching, typed conversion, unit selection, per-category negate)
-  plus screenshot reviews, and 294/294 ViewModel tests.
+  offsets; Converter: view switching, typed conversion, unit selection, per-category negate;
+  Settings: open/back and theme selection; shortcuts: mode accelerators) plus screenshot
+  reviews, and 294/294 ViewModel tests.
 
 - Settings page is ported. `SettingsView` provides the theme selector (Light/Dark/Use system
   setting, driving `Application.RequestedThemeVariant`) and the about/feedback section, opened
@@ -298,7 +301,9 @@ non-graphing mode.*
 - Programmer (bit-flip and radix panels) *Done.*
 - Date calculation *Done.*
 - Unit Converter (all categories + live currency). *Done (live-data verification pending).*
-- Settings page, snapshots, keyboard shortcut parity. *Pending.*
+- Settings page *Done.*
+- Snapshots *ViewModel layer done (tested); desktop lifecycle hook pending.*
+- Keyboard shortcut parity *Mode accelerators done; further access-key/non-mode parity pending.*
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.
 
