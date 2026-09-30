@@ -34,9 +34,17 @@ namespace CalculatorApp.Avalonia
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // Standard is the only mode with a ported view in Phase 2.
+                // QA/automation knob: CALCULATOR_MODE=Standard|Scientific|... 
+                ViewMode startMode = ViewMode.Standard;
+                string modeName = Environment.GetEnvironmentVariable("CALCULATOR_MODE");
+                if (!string.IsNullOrEmpty(modeName)
+                    && Enum.TryParse(modeName, ignoreCase: true, out ViewMode parsedMode))
+                {
+                    startMode = parsedMode;
+                }
+
                 ViewModel = new ApplicationViewModel();
-                ViewModel.Initialize(ViewMode.Standard);
+                ViewModel.Initialize(startMode);
 
                 desktop.MainWindow = new MainWindow
                 {

@@ -63,8 +63,14 @@ namespace CalculatorApp.Avalonia.Views
             LimitSelectableModes();
         }
 
-        // Phase 2 ships only Standard views; keep the rest of the navigation
-        // visible but disabled until Phases 3-4 port the remaining modes.
+        // Only the ported views are selectable; keep the rest of the
+        // navigation visible but disabled until the remaining modes land.
+        private static readonly ViewMode[] s_supportedModes =
+        {
+            ViewMode.Standard,
+            ViewMode.Scientific,
+        };
+
         private void LimitSelectableModes()
         {
             if (ViewModel == null)
@@ -76,7 +82,7 @@ namespace CalculatorApp.Avalonia.Views
             {
                 foreach (NavCategory category in group.Categories)
                 {
-                    if (category.ViewMode != ViewMode.Standard)
+                    if (System.Array.IndexOf(s_supportedModes, category.ViewMode) < 0)
                     {
                         category.IsEnabled = false;
                     }

@@ -132,8 +132,9 @@
                         Click="ToggleMemoryFlyout" />
             </Grid>
 
-            <!-- Number pad panel: standard operators + functions + digit pad -->
+            <!-- Number pad panel: standard or scientific operators + digit pad -->
             <Grid x:Name="NumpadPanel" Grid.Row="4" Margin="3,0,3,3">
+                <Grid x:Name="StandardNumpad" IsVisible="{Binding IsStandard}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
@@ -242,6 +243,9 @@
                 <c:CalculatorButton x:Name="NegateButton" Grid.Row="5" Grid.Column="2" Classes="CalcButton SymbolOperatorKeypadButton" Content="&#xF898;" ButtonId="Negate" IsEnabled="{Binding IsInError, Converter={StaticResource BooleanNegationConverter}}" />
                 <c:CalculatorButton x:Name="Num0Button"  Grid.Row="5" Grid.Column="3" Classes="CalcButton NumericButtonStyle24" Content="0" ButtonId="Zero" />
                 <c:CalculatorButton x:Name="DecimalSeparatorButton" Grid.Row="5" Grid.Column="4" Classes="CalcButton NumericButtonStyle24" Content="." ButtonId="Decimal" IsEnabled="{Binding IsDecimalEnabled}" />
+                </Grid>
+
+                <v:ScientificOperatorsView x:Name="ScientificOperators" IsVisible="{Binding IsScientific}" />
             </Grid>
         </Grid>
 

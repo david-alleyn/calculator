@@ -266,6 +266,65 @@
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
     </Style>
 
+    <!-- Trigonometry / Function panel buttons (port of OperatorPanelButtonStyle). -->
+    <Style Selector="Button.OperatorPanelButton">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="Button.OperatorPanelButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.OperatorPanelButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorPressedBrush}" />
+    </Style>
+
+    <!-- Shift / hyp toggle buttons (port of the CaptionToggle styles). -->
+    <Style Selector="ToggleButton.CalcToggle">
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="12" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource CalcOperatorCaptionSize}" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:checked">
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+    </Style>
+
+    <Style Selector="ToggleButton.CalcToggle:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
+    </Style>
+
     <!-- Docked panel tab headers (port of the pivot header used for History/Memory). -->
     <Style Selector="TabItem.DockPivotTabItem">
         <Setter Property="Height" Value="48" />

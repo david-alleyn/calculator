@@ -4,10 +4,7 @@
 using System;
 using System.Linq;
 
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Headless;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -25,24 +22,10 @@ namespace Calculator.Avalonia.Tests
     [TestClass]
     public class StandardCalculatorViewTests
     {
-        private static AppBuilder s_app;
-
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            s_app = AvaloniaTestHost.BuildHeadlessApp().SetupWithoutStarting();
-        }
-
-        [ClassCleanup]
-        public static void ClassCleanup()
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                if (s_app?.Instance?.ApplicationLifetime is IControlledApplicationLifetime lifetime)
-                {
-                    lifetime.Shutdown();
-                }
-            });
+            AvaloniaTestHost.EnsureInitialized();
         }
 
         private static (Window window, ApplicationViewModel viewModel) OpenCalculator()

@@ -245,9 +245,25 @@ history-expression glyph serialization bug and the high-contrast variant.*
 *Optional: the app is fully usable with Standard mode; this phase extends coverage to every
 non-graphing mode.*
 
-- Scientific (including Shift/inverse button collapse states), Programmer (bit-flip and radix
-  panels), Date calculation, and Unit Converter (all categories + live currency).
+**Progress (in progress):**
+- Scientific mode is ported and navigable. `ScientificOperatorsView` mirrors
+  `CalculatorScientificOperators.xaml`: the Trigonometry/Function flyout panel buttons (with the
+  shift/hyp sub-grid switching), the main shift toggle that swaps the advanced function column
+  between direct and inverse rows, pi/e, the operator column, and its own number pad.
+- `CalculatorView` overlays the Standard and Scientific keypads by mode
+  (`IsStandard`/`IsScientific`); the shell now enables the Scientific navigation item.
+- Verified: 13/13 Avalonia view tests (6 new Scientific tests: mode switching, π, arithmetic,
+  x², shift/inverse cube, and sin(30°)=0.5 through the flyout) plus a screenshot review.
+
+**Remaining:**
+- Programmer mode (display panel, bit-flip panel, radix operators), Date calculation, and Unit
+  Converter (all categories + live currency).
 - Settings page, snapshots, keyboard shortcut parity.
+
+- Scientific (including Shift/inverse button collapse states) *Done.*
+- Programmer (bit-flip and radix panels), Date calculation, and Unit Converter (all categories
+  + live currency). *Pending.*
+- Settings page, snapshots, keyboard shortcut parity. *Pending.*
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.
 

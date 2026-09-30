@@ -18,6 +18,8 @@ namespace Calculator.Avalonia.Tests
 
     internal static class AvaloniaTestHost
     {
+        private static bool s_initialized;
+
         public static AppBuilder BuildHeadlessApp()
         {
             return AppBuilder
@@ -26,6 +28,17 @@ namespace Calculator.Avalonia.Tests
                 {
                     UseHeadlessDrawing = true,
                 });
+        }
+
+        // Headless setup is process-wide; initialize once so multiple test
+        // classes can share it.
+        public static void EnsureInitialized()
+        {
+            if (!s_initialized)
+            {
+                BuildHeadlessApp().SetupWithoutStarting();
+                s_initialized = true;
+            }
         }
     }
 }
