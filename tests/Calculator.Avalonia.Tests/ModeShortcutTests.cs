@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 using CalculatorApp.Avalonia;
+using CalculatorApp.Avalonia.Controls;
 using CalculatorApp.ViewModel;
 using CalculatorApp.ViewModel.Common;
 
@@ -85,6 +86,36 @@ namespace Calculator.Avalonia.Tests
             // Graphing (3) is not ported and therefore disabled in the nav.
             Assert.IsFalse(window.TryHandleShortcut(Key.D3, KeyModifiers.Control));
             Assert.AreEqual(ViewMode.Standard, viewModel.Mode);
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void EnterKey_AlwaysMeansEquals_EvenWithAKeypadButtonFocused()
+        {
+            var (window, viewModel) = OpenCalculator();
+            var calculator = viewModel.CalculatorViewModel;
+
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Seven);
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Add);
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Eight);
+
+            // Clicking a keypad button leaves it focused; Return must still
+            // compute (7 + 8), not re-press the focused 8.
+            var button = window.GetVisualDescendants().OfType<CalculatorButton>()
+                .First(candidate => candidate.Name == "Num8Button");
+            Dispatcher.UIThread.Post(() => button.Focus());
+            Dispatcher.UIThread.RunJobs();
+
+            button.RaiseEvent(new KeyEventArgs
+            {
+                RoutedEvent = InputElement.KeyDownEvent,
+                Key = Key.Enter,
+                KeyModifiers = KeyModifiers.None,
+            });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.AreEqual("15", calculator.DisplayValue);
 
             Dispatcher.UIThread.Post(window.Close);
         }

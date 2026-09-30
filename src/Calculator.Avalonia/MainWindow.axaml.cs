@@ -8,6 +8,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
@@ -23,6 +24,12 @@ namespace CalculatorApp.Avalonia
         public MainWindow()
         {
             InitializeComponent();
+
+            // Return must always mean Equals on the calculator keypads, even
+            // when a keypad button still holds focus from the last click (the
+            // focused button would otherwise handle Enter itself). Tunnel so
+            // this runs before the focused control.
+            AddHandler(KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
 
             // QA helper: when CALCULATOR_SCREENSHOT is set, render the window
             // content to that path shortly after the first frame.
@@ -114,11 +121,61 @@ namespace CalculatorApp.Avalonia
                 return;
             }
 
-            if (CalculatorKeyboardMap.TryMap(e.Key, e.KeyModifiers, out NumbersAndOperatorsEnum operation))
+            if (TryHandleCalculatorInput(e.Key, e.KeyModifiers))
             {
-                ViewModel?.CalculatorViewModel?.ButtonPressedCommand.Execute(operation);
                 e.Handled = true;
             }
+        }
+
+        // Enter means Equals for the calculator modes regardless of which
+        // button currently has focus; editors and the navigation list keep
+        // their native Enter behavior.
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter || e.KeyModifiers != KeyModifiers.None)
+            {
+                return;
+            }
+
+            if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox or ListBoxItem)
+            {
+                return;
+            }
+
+            ViewMode mode = ViewModel?.Mode ?? ViewMode.None;
+            if (!NavCategory.IsCalculatorViewMode(mode) || ViewModel?.CalculatorViewModel == null)
+            {
+                return;
+            }
+
+            ViewModel.CalculatorViewModel.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Equals);
+            e.Handled = true;
+        }
+
+        // Routes mapped keys to the ViewModel of the active mode (the hidden
+        // calculator must not receive input while a converter is showing).
+        private bool TryHandleCalculatorInput(Key key, KeyModifiers modifiers)
+        {
+            if (!CalculatorKeyboardMap.TryMap(key, modifiers, out NumbersAndOperatorsEnum operation))
+            {
+                return false;
+            }
+
+            ViewMode mode = ViewModel?.Mode ?? ViewMode.None;
+
+            if (NavCategory.IsCalculatorViewMode(mode) && ViewModel.CalculatorViewModel != null)
+            {
+                ViewModel.CalculatorViewModel.ButtonPressedCommand.Execute(operation);
+                return true;
+            }
+
+            if (NavCategory.IsConverterViewMode(mode) && ViewModel.ConverterViewModel != null)
+            {
+                ViewModel.ConverterViewModel.ButtonPressedCommand.Execute(operation);
+                return true;
+            }
+
+            return false;
         }
 
         private void OnKeyUp(object sender, KeyEventArgs e)
