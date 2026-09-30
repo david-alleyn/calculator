@@ -264,22 +264,29 @@ non-graphing mode.*
   secondary result) and the add/subtract flow (start date, Add/Subtract, years/months/days
   offset combos, resulting date), using Avalonia `CalendarDatePicker`/`ComboBox` in place of the
   UWP custom calendar template.
+- Unit Converter is ported and navigable. `UnitConverterView` (port of `UnitConverter.xaml`)
+  covers the from/to value displays with currency symbols, the unit selectors, the supplementary
+  results area (currency ratio/timestamp), and the converter number pad with the per-category
+  negate affordance. The shell maps each converter navigation mode (Length, Temperature,
+  Currency, …) to the converter's category.
 - `CalculatorView` overlays the Standard/Scientific/Programmer keypads by mode; the shell swaps
-  in `DateCalculatorView` for Date mode and enables the Scientific/Programmer/Date navigation
-  items.
-- Verified: 21/21 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
+  in `DateCalculatorView`/`UnitConverterView` for their modes and enables the
+  Scientific/Programmer/Date/converter navigation items.
+- Verified: 26/26 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
   shift/inverse cube, sin(30°)=0.5 via flyout; Programmer: panel switching, hex conversion,
   bit-flip, word-size cycling, AND; Date: view switching, date difference, add/subtract with
-  offsets) plus screenshot reviews.
+  offsets; Converter: view switching, typed conversion, unit selection, per-category negate)
+  plus screenshot reviews, and 294/294 ViewModel tests.
 
 **Remaining:**
-- Unit Converter (all categories + live currency).
 - Settings page, snapshots, keyboard shortcut parity.
+- Live currency data (the converter loads currency data through the existing loader; verifying
+  it against the network is a follow-up).
 
 - Scientific (including Shift/inverse button collapse states) *Done.*
 - Programmer (bit-flip and radix panels) *Done.*
 - Date calculation *Done.*
-- Unit Converter (all categories + live currency). *Pending.*
+- Unit Converter (all categories + live currency). *Done (live-data verification pending).*
 - Settings page, snapshots, keyboard shortcut parity. *Pending.*
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.

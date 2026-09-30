@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -247,6 +248,15 @@ namespace CalculatorApp.ViewModel
                     ConverterViewModel = new UnitConverterViewModel();
                 }
                 ConverterViewModel.Mode = _mode;
+
+                // The converter's category is driven by the navigation mode
+                // (Length, Temperature, Currency, …).
+                Category category = ConverterViewModel.Categories.FirstOrDefault(
+                    candidate => candidate.GetModelCategoryId() == NavCategoryStates.Serialize(_mode));
+                if (category != null)
+                {
+                    ConverterViewModel.CurrentCategory = category;
+                }
             }
 
             var resProvider = AppResourceProvider.GetInstance();

@@ -86,13 +86,17 @@ namespace CalculatorApp.Avalonia.Views
             }
         }
 
-        // Date (and later Converter) use different ViewModels and views, so the
-        // shell swaps the content view instead of keypads within CalculatorView.
+        // Date and Converter use different ViewModels and views, so the shell
+        // swaps the content view instead of keypads within CalculatorView.
         private void UpdateModeVisibility()
         {
-            bool isDate = ViewModel?.Mode == ViewMode.Date;
-            Calculator.IsVisible = !isDate;
+            ViewMode mode = ViewModel?.Mode ?? ViewMode.None;
+            bool isDate = mode == ViewMode.Date;
+            bool isConverter = NavCategory.IsConverterViewMode(mode);
+
+            Calculator.IsVisible = !isDate && !isConverter;
             DateCalculator.IsVisible = isDate;
+            UnitConverter.IsVisible = isConverter;
         }
 
         // Only the ported views are selectable; keep the rest of the
@@ -116,7 +120,10 @@ namespace CalculatorApp.Avalonia.Views
             {
                 foreach (NavCategory category in group.Categories)
                 {
-                    if (System.Array.IndexOf(s_supportedModes, category.ViewMode) < 0)
+                    bool supported = System.Array.IndexOf(s_supportedModes, category.ViewMode) >= 0
+                        || NavCategory.IsConverterViewMode(category.ViewMode);
+
+                    if (!supported)
                     {
                         category.IsEnabled = false;
                     }

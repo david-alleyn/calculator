@@ -99,6 +99,12 @@
                                   Grid.Column="1"
                                   IsVisible="False"
                                   DataContext="{Binding DateCalcViewModel}" />
+
+            <!-- Unit converter -->
+            <v:UnitConverterView x:Name="UnitConverter"
+                                 Grid.Column="1"
+                                 IsVisible="False"
+                                 DataContext="{Binding ConverterViewModel}" />
         </Grid>
 
         <!-- Title bar row -->
