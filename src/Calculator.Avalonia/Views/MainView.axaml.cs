@@ -112,6 +112,19 @@ namespace CalculatorApp.Avalonia.Views
             }
         }
 
+        // Alt shows the navigation access-key hints, like UWP access keys.
+        public void SetAccessKeyHintsVisible(bool visible)
+        {
+            if (visible)
+            {
+                NavPane.Classes.Add("AccessKeyHintsVisible");
+            }
+            else
+            {
+                NavPane.Classes.Remove("AccessKeyHintsVisible");
+            }
+        }
+
         // Date and Converter use different ViewModels and views, so the shell
         // swaps the content view instead of keypads within CalculatorView.
         private void UpdateModeVisibility()

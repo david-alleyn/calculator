@@ -26,8 +26,13 @@ namespace Calculator.Avalonia.Tests
 
         private static (MainWindow window, ApplicationViewModel viewModel) OpenCalculator()
         {
+            return OpenCalculator(ViewMode.Standard);
+        }
+
+        private static (MainWindow window, ApplicationViewModel viewModel) OpenCalculator(ViewMode mode)
+        {
             var viewModel = new ApplicationViewModel();
-            viewModel.Initialize(ViewMode.Standard);
+            viewModel.Initialize(mode);
 
             MainWindow window = null;
             Dispatcher.UIThread.Post(() =>
@@ -107,6 +112,72 @@ namespace Calculator.Avalonia.Tests
             var (window, _) = OpenCalculator();
 
             Assert.IsTrue(window.TryHandleShortcut(Key.H, KeyModifiers.Control));
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void ScientificChord_Sinh_Computes()
+        {
+            var (window, viewModel) = OpenCalculator(ViewMode.Scientific);
+            var calculator = viewModel.CalculatorViewModel;
+
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.One);
+
+            Assert.IsTrue(window.TryHandleShortcut(Key.S, KeyModifiers.Control));
+            Assert.IsTrue(calculator.DisplayValue.StartsWith("1.175"),
+                $"sinh(1) should be about 1.175; got '{calculator.DisplayValue}'.");
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void ScientificChord_IsInactiveInStandardMode()
+        {
+            var (window, _) = OpenCalculator(ViewMode.Standard);
+
+            Assert.IsFalse(window.TryHandleShortcut(Key.S, KeyModifiers.Control));
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void ClipboardShortcut_CopiesAndPastesDisplayValue()
+        {
+            var (window, viewModel) = OpenCalculator(ViewMode.Standard);
+            var calculator = viewModel.CalculatorViewModel;
+
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Four);
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Two);
+
+            Assert.IsTrue(window.TryHandleShortcut(Key.C, KeyModifiers.Control));
+
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Clear);
+            Assert.AreEqual("0", calculator.DisplayValue);
+
+            Assert.IsTrue(window.TryHandleShortcut(Key.V, KeyModifiers.Control));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.AreEqual("42", calculator.DisplayValue);
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void AccessKeyHints_ToggleOnMainView()
+        {
+            var (window, _) = OpenCalculator();
+            var main = window.GetVisualDescendants().OfType<CalculatorApp.Avalonia.Views.MainView>().First();
+            var navPane = window.GetVisualDescendants().OfType<Border>()
+                .First(control => control.Name == "NavPane");
+
+            Assert.IsFalse(navPane.Classes.Contains("AccessKeyHintsVisible"));
+
+            main.SetAccessKeyHintsVisible(true);
+            Assert.IsTrue(navPane.Classes.Contains("AccessKeyHintsVisible"));
+
+            main.SetAccessKeyHintsVisible(false);
+            Assert.IsFalse(navPane.Classes.Contains("AccessKeyHintsVisible"));
 
             Dispatcher.UIThread.Post(window.Close);
         }

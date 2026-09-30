@@ -73,6 +73,10 @@ namespace CalculatorApp.Avalonia
                     DataContext = ViewModel,
                 };
 
+                // Route the ViewModel clipboard facade to the system clipboard.
+                LinuxClipboard.SetProvider(
+                    new AvaloniaClipboardProvider(() => desktop.MainWindow?.Clipboard));
+
                 desktop.ShutdownRequested += (_, _) => SnapshotStore.Save(ViewModel.Snapshot);
             }
 

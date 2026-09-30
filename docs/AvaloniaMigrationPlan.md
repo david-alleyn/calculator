@@ -12,7 +12,7 @@ builds and passes its tests on Linux via CMake/ctest, the C ABI shim
 P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests against the native engine).
 The `src/Calculator.Avalonia` app provides the app shell, all non-graphing mode views, session
 persistence, and history/memory panes (docked ↔ flyout) with light/dark theming, verified by a
-headless view test suite (36/36). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging manifests (validated
+headless view test suite (40/40). Phase 5 has added a Linux CI workflow, Flatpak/AUR packaging manifests (validated
 with real `flatpak-builder` and `makepkg` runs), and a resw→resx localization pipeline. Key
 decisions are recorded in [Decisions](#decisions).
 
@@ -274,7 +274,7 @@ non-graphing mode.*
 - `CalculatorView` overlays the Standard/Scientific/Programmer keypads by mode; the shell swaps
   in `DateCalculatorView`/`UnitConverterView` for their modes and enables the
   Scientific/Programmer/Date/converter navigation items.
-- Verified: 36/36 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
+- Verified: 40/40 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
   shift/inverse cube, sin(30°)=0.5 via flyout; Programmer: panel switching, hex conversion,
   bit-flip, word-size cycling, AND; Date: view switching, date difference, add/subtract with
   offsets; Converter: view switching, typed conversion, unit selection, per-category negate;
@@ -289,19 +289,22 @@ non-graphing mode.*
 
 - Keyboard shortcuts: mode accelerators mirror the UWP navigation access keys
   (Ctrl/Alt+1 Standard, +2 Scientific, +4 Programmer, +5 Date), plus the memory/history chords
-  (Ctrl+M store, +L clear, +R recall, +P add, +Q subtract, +H history); unported/disabled modes
-  are ignored. The calculator keypad mapping was already ported.
+  (Ctrl+M store, +L clear, +R recall, +P add, +Q subtract, +H history), the scientific function
+  chords (Ctrl+S/T/O/U/I/J ± Shift for hyperbolic/inverse-hyperbolic, Ctrl+Y/D/N), and global
+  Ctrl+C/Ctrl+V (skipped while a text field has focus). Holding Alt shows the navigation
+  access-key hints. The calculator keypad mapping was already ported.
 - Snapshots: a public `SnapshotSerializer` bridges the ViewModel snapshot to JSON, and the
   desktop shell persists the session on shutdown (`ShutdownRequested`) and restores it on the
   next launch (a `CALCULATOR_MODE` override skips the restore for QA).
+- Clipboard: the ViewModel clipboard facade is wired to Avalonia's system clipboard, so
+  copy/paste round-trips with other desktop apps.
 - Live currency data: verified end-to-end. The loader uses the built-in planet-currency mock
   data (the upstream fwlink endpoints the C++ engine used are dead), and the Currency category
   loads its units, symbols, ratio, and timestamp in the app.
 
 **Remaining:**
-- Further shortcut parity (Alt access keys on the navigation pane, scientific function chords,
-  global copy/paste which could conflict with focused text fields).
-- A real network-backed currency source if a live feed is desired.
+- A real network-backed currency source if a live feed is desired (no maintained endpoint
+  exists today; the C++ engine ships the same mock data).
 
 - Scientific (including Shift/inverse button collapse states) *Done.*
 - Programmer (bit-flip and radix panels) *Done.*

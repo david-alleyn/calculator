@@ -204,6 +204,19 @@
         <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
     </Style>
 
+    <!-- Navigation access-key hints (shown while Alt is held). -->
+    <Style Selector="TextBlock.AccessKeyHint">
+        <Setter Property="IsVisible" Value="False" />
+        <Setter Property="Margin" Value="8,0,0,0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
+    <Style Selector="Border.AccessKeyHintsVisible TextBlock.AccessKeyHint">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+
     <!-- Settings entry in the navigation pane footer. -->
     <Style Selector="Button.SettingsNavButton">
         <Setter Property="HorizontalAlignment" Value="Stretch" />

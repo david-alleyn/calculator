@@ -48,7 +48,7 @@
                                              SelectionChanged="OnNavSelectionChanged">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid ColumnDefinitions="Auto,*"
+                                                <Grid ColumnDefinitions="Auto,*,Auto"
                                                       Margin="4,0,8,0"
                                                       IsEnabled="{Binding IsEnabled}"
                                                       Opacity="1">
@@ -62,6 +62,9 @@
                                                                FontSize="14"
                                                                VerticalAlignment="Center"
                                                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                    <TextBlock Grid.Column="2"
+                                                               Classes="AccessKeyHint"
+                                                               Text="{Binding AccessKey}" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>

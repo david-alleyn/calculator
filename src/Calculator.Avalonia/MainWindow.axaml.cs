@@ -102,6 +102,12 @@ namespace CalculatorApp.Avalonia
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            // Alt reveals the navigation access-key hints (UWP behavior).
+            if (e.Key == Key.LeftAlt || e.Key == Key.RightAlt)
+            {
+                (Main as MainView)?.SetAccessKeyHintsVisible(true);
+            }
+
             if (TryHandleShortcut(e.Key, e.KeyModifiers))
             {
                 e.Handled = true;
@@ -115,11 +121,112 @@ namespace CalculatorApp.Avalonia
             }
         }
 
-        // Global accelerators: mode switching plus the UWP memory/history
-        // shortcuts.
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftAlt || e.Key == Key.RightAlt)
+            {
+                (Main as MainView)?.SetAccessKeyHintsVisible(false);
+            }
+        }
+
+        // Global accelerators: mode switching, clipboard, scientific functions,
+        // and the UWP memory/history shortcuts.
         public bool TryHandleShortcut(Key key, KeyModifiers modifiers)
         {
-            return TryHandleModeShortcut(key, modifiers) || TryHandleCommandShortcut(key, modifiers);
+            return TryHandleModeShortcut(key, modifiers)
+                || TryHandleClipboardShortcut(key, modifiers)
+                || TryHandleScientificChord(key, modifiers)
+                || TryHandleCommandShortcut(key, modifiers);
+        }
+
+        // Ctrl+C / Ctrl+V for the active mode, skipped while a text field has
+        // focus so it keeps its native editing behavior.
+        private bool TryHandleClipboardShortcut(Key key, KeyModifiers modifiers)
+        {
+            if (!modifiers.HasFlag(KeyModifiers.Control)
+                || modifiers.HasFlag(KeyModifiers.Shift)
+                || modifiers.HasFlag(KeyModifiers.Alt))
+            {
+                return false;
+            }
+
+            if (key != Key.C && key != Key.V)
+            {
+                return false;
+            }
+
+            if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
+            {
+                return false;
+            }
+
+            ViewMode mode = ViewModel?.Mode ?? ViewMode.None;
+            bool copy = key == Key.C;
+
+            if (NavCategory.IsConverterViewMode(mode) && ViewModel?.ConverterViewModel != null)
+            {
+                (copy ? ViewModel.ConverterViewModel.CopyCommand : ViewModel.ConverterViewModel.PasteCommand).Execute(null);
+                return true;
+            }
+
+            if (mode == ViewMode.Date && ViewModel?.DateCalcViewModel != null)
+            {
+                if (copy)
+                {
+                    ViewModel.DateCalcViewModel.CopyCommand.Execute(null);
+                    return true;
+                }
+                return false;
+            }
+
+            if (ViewModel?.CalculatorViewModel != null)
+            {
+                (copy ? ViewModel.CalculatorViewModel.CopyCommand : ViewModel.CalculatorViewModel.PasteCommand).Execute(null);
+                return true;
+            }
+
+            return false;
+        }
+
+        // Scientific-mode function chords (Ctrl+S/T/O/…, Ctrl+Shift+…).
+        private bool TryHandleScientificChord(Key key, KeyModifiers modifiers)
+        {
+            if (!modifiers.HasFlag(KeyModifiers.Control)
+                || modifiers.HasFlag(KeyModifiers.Alt)
+                || ViewModel?.Mode != ViewMode.Scientific
+                || ViewModel.CalculatorViewModel == null)
+            {
+                return false;
+            }
+
+            bool shift = modifiers.HasFlag(KeyModifiers.Shift);
+            NumbersAndOperatorsEnum? operation = (key, shift) switch
+            {
+                (Key.S, false) => NumbersAndOperatorsEnum.Sinh,
+                (Key.S, true) => NumbersAndOperatorsEnum.InvSinh,
+                (Key.O, false) => NumbersAndOperatorsEnum.Cosh,
+                (Key.O, true) => NumbersAndOperatorsEnum.InvCosh,
+                (Key.T, false) => NumbersAndOperatorsEnum.Tanh,
+                (Key.T, true) => NumbersAndOperatorsEnum.InvTanh,
+                (Key.U, false) => NumbersAndOperatorsEnum.Sech,
+                (Key.U, true) => NumbersAndOperatorsEnum.InvSech,
+                (Key.I, false) => NumbersAndOperatorsEnum.Csch,
+                (Key.I, true) => NumbersAndOperatorsEnum.InvCsch,
+                (Key.J, false) => NumbersAndOperatorsEnum.Coth,
+                (Key.J, true) => NumbersAndOperatorsEnum.InvCoth,
+                (Key.Y, false) => NumbersAndOperatorsEnum.YRootX,
+                (Key.D, false) => NumbersAndOperatorsEnum.Degrees,
+                (Key.N, false) => NumbersAndOperatorsEnum.EPowerX,
+                _ => null,
+            };
+
+            if (operation == null)
+            {
+                return false;
+            }
+
+            ViewModel.CalculatorViewModel.ButtonPressedCommand.Execute(operation.Value);
+            return true;
         }
 
         // Ctrl+M store, Ctrl+L clear, Ctrl+R recall, Ctrl+P add, Ctrl+Q

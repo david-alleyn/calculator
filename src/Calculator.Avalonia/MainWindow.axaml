@@ -8,7 +8,8 @@
         Height="620"
         MinWidth="320"
         MinHeight="500"
-        KeyDown="OnKeyDown">
+        KeyDown="OnKeyDown"
+        KeyUp="OnKeyUp">
 
     <v:MainView x:Name="Main" />
 
