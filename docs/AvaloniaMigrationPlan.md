@@ -5,8 +5,9 @@ This document describes the plan to migrate Windows Calculator from its current 
 the platform-neutralization work required in the ViewModel and native engine layers.
 
 **Status:** Phases 0-2 complete; Phase 3 complete for every non-graphing mode (Scientific,
-Programmer, Date, Unit Converter) plus Settings and mode accelerators, with a few follow-ups
-tracked in that section; Phase 4 optional and not started; Phase 5 in progress. The engine
+Programmer, Date, Unit Converter) plus Settings, session persistence, and shortcut/clipboard
+parity (the only outstanding item is a real network currency feed, which has no maintained
+endpoint); Phase 4 optional and not started; Phase 5 in progress. The engine
 builds and passes its tests on Linux via CMake/ctest, the C ABI shim
 (`src/CalcManager.Interop/calc_api.*`) is exercised from net10.0 through source-generated
 P/Invoke, and the ViewModels are de-Windowed (294/294 Linux tests against the native engine).
@@ -247,7 +248,7 @@ history-expression glyph serialization bug and the high-contrast variant.*
 *Optional: the app is fully usable with Standard mode; this phase extends coverage to every
 non-graphing mode.*
 
-**Progress (complete, with follow-ups):**
+**Progress (complete):**
 - Scientific mode is ported and navigable. `ScientificOperatorsView` mirrors
   `CalculatorScientificOperators.xaml`: the Trigonometry/Function flyout panel buttons (with the
   shift/hyp sub-grid switching), the main shift toggle that swaps the advanced function column
@@ -278,9 +279,9 @@ non-graphing mode.*
   shift/inverse cube, sin(30°)=0.5 via flyout; Programmer: panel switching, hex conversion,
   bit-flip, word-size cycling, AND; Date: view switching, date difference, add/subtract with
   offsets; Converter: view switching, typed conversion, unit selection, per-category negate;
-  Settings: open/back and theme selection; shortcuts: mode accelerators and memory commands;
-  snapshots: session save/load round-trip and corrupt-file handling) plus screenshot reviews,
-  and 294/294 ViewModel tests.
+  Settings: open/back and theme selection; shortcuts: mode accelerators, memory commands,
+  scientific chords, clipboard round-trip, and access-key hints; snapshots: session save/load
+  round-trip and corrupt-file handling) plus screenshot reviews, and 294/294 ViewModel tests.
 
 - Settings page is ported. `SettingsView` provides the theme selector (Light/Dark/Use system
   setting, driving `Application.RequestedThemeVariant`) and the about/feedback section, opened
@@ -309,10 +310,10 @@ non-graphing mode.*
 - Scientific (including Shift/inverse button collapse states) *Done.*
 - Programmer (bit-flip and radix panels) *Done.*
 - Date calculation *Done.*
-- Unit Converter (all categories + live currency). *Done (live-data verification pending).*
+- Unit Converter (all categories + live currency). *Done (loader verified with the built-in mock data).*
 - Settings page *Done.*
-- Snapshots *ViewModel layer done (tested); desktop lifecycle hook pending.*
-- Keyboard shortcut parity *Mode accelerators done; further access-key/non-mode parity pending.*
+- Snapshots *Done: the desktop shell persists and restores the session across launches.*
+- Keyboard shortcut parity *Done: mode accelerators, memory/history chords, scientific function chords, global copy/paste, and access-key hints.*
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.
 
