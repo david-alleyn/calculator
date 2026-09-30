@@ -57,7 +57,7 @@ decisions are recorded in [Decisions](#decisions).
 | ViewModel | `src/Calculator.ViewModels` | C# / UAP, CommunityToolkit.Mvvm, `x:Bind` | Retarget, ~15 files use `Windows.*` APIs |
 | Model / engine | `src/CalcManager` | C++ (RatPack arbitrary-precision engine), mostly portable | Keep, build with Clang + CMake |
 | Interop | `src/CalcManager.Interop` | WinRT projection of the C++ engine for C# | Replace with C ABI + P/Invoke |
-| Graphing | `src/GraphingImpl` (C++ evaluator) + `src/GraphControl` (UWP XAML C++ control) | WinRT | Keep evaluator; rewrite control as Avalonia SkiaSharp control |
+| Graphing | `src/GraphingImpl` (**mock** engine; the proprietary Microsoft engine was never open-sourced) + `src/GraphControl` (UWP XAML C++ control) | WinRT | UI is portable, but there is no working engine to reuse — one must be built or integrated |
 | Tests | `src/Calculator.Tests` (C#), `src/CalculatorUnitTests` (C++), `src/CalculatorUITests` (WinAppDriver) | — | xUnit, ctest, Avalonia.Headless |
 | Packaging / CI | MSIX bundle, Azure Pipelines, Windows-hosted runners | — | Flatpak / AUR, GitHub Actions on `ubuntu-latest` |
 
@@ -70,7 +70,8 @@ src/Calculator.Tests             MSTest on net10.0 (same sources as the Windows 
 tests/Calculator.Avalonia.Tests  Avalonia.Headless view tests driving real controls
 src/CalcManager                  C++ (unchanged engine), CMake build on Linux + Windows
 src/CalcManager.Interop          thin C API shim exposing the engine to P/Invoke
-src/GraphingImpl                 C++ evaluator (unchanged), exposed through the same C API
+src/GraphingEngine               graphing/math engine (build or integrate behind GraphingInterfaces;
+                                 the in-repo GraphingImpl is a mock, not a usable engine)
 src/PlotControl                  Avalonia control rendering plots via SkiaSharp
 build/pipelines/*.yaml           GitHub Actions workflows for linux CI (engine + dotnet)
 packaging/                       Flatpak manifest + AUR PKGBUILD metadata; AppImage optional
@@ -319,14 +320,23 @@ non-graphing mode.*
 
 ### Phase 4 - Graphing (optional)
 
-*Optional; also the highest-risk phase. The current graphing UI is a native UWP C++ control.*
+*Optional; the highest-risk phase, and larger than a normal port: **the graphing engine was
+never open-sourced.** `src/GraphingImpl` in this repository is a mock (`MockGraphingImpl`, whose
+`MathSolver`/`Graph`/`GraphRenderer` are no-ops), and the graphing UI is the in-box UI without a
+working backend. Microsoft's shipping Windows Calculator used a proprietary engine (shared with
+Microsoft Mathematics/OneNote) that is not available here, so there is nothing to "keep."*
 
-- Keep the C++ `GraphingImpl` evaluator behind the C ABI.
+- **Engine first (the bulk of the work):** build or integrate a real graphing/math engine —
+  expression parsing/evaluation, plotting-data generation, and key-graph features (roots,
+  extrema, intercepts, asymptotes) — behind the existing `GraphingInterfaces` API so the managed
+  ViewModels can keep their current shape. Verify against an open-source evaluator before
+  committing to one.
 - Implement `PlotControl` (SkiaSharp): grid/axes, pan, zoom, trace, key graph features.
 - Port `EquationInputArea`, `EquationStylePanelControl`, `GraphingSettings`, `GraphingNumPad`.
 
-**Exit criteria:** graphing mode at parity for supported equation types, with acceptable
-interaction frame rates on a mid-range Linux desktop.
+**Exit criteria:** graphing mode evaluates and plots supported equation types, with acceptable
+interaction frame rates on a mid-range Linux desktop. A useful intermediate milestone is
+plotting equations with a minimal evaluator (no key-graph features).
 
 ### Phase 5 - Platform tooling and packaging
 
@@ -394,11 +404,14 @@ interaction frame rates on a mid-range Linux desktop.
   results; the C++ test suite is the contract and must stay green on both platforms.
 - **Rich math input.** `MathRichEditBox` depends on UWP `RichEditBox`; the Avalonia replacement is
   expected to be display-only + a plain parser-based input in v1.
-- **Graphing performance and fidelity.** The most complex visual component in the app is being
-  reimplemented on a different rendering stack.
+- **Graphing engine gap.** The graphing engine was never open-sourced (`GraphingImpl` is a
+  mock), so Phase 4 requires building or integrating one; its correctness and performance are
+  unproven and are the single largest unknown in the plan. The `PlotControl` rewrite is a
+  smaller sub-risk.
 - **Accessibility.** Calculator is a benchmark app here; Avalonia automation peers exist but need
   per-mode verification.
-- **Currency converter** requires connectivity; define and test offline behavior on Linux.
+- **Currency converter** uses built-in mock rates (the upstream feed the C++ engine used is
+  dead); a live feed is out of scope unless a maintained endpoint is found.
 
 ## Rollout and compatibility
 
@@ -417,12 +430,14 @@ Figures assume a small team with one native-engine expert.
 | 1 - De-Windows ViewModels | ~4-6 weeks |
 | 2 - App shell + Standard mode | ~3-4 weeks |
 | 3 - Remaining modes | ~6-8 weeks |
-| 4 - Graphing | ~6-10 weeks |
+| 4 - Graphing (UI port) | ~6-10 weeks |
+| 4b - Graphing engine (build or integrate) | open-ended; months, no reference implementation |
 | 5 - Platform tooling and packaging | ~3-4 weeks |
 | 6 - Cutover | ~2 weeks |
 
-**Total: roughly 6 person-months for full parity.** Phase 1-2 alone yields a runnable
-Standard/Scientific Linux app much earlier and is a natural first milestone.
+**Total: roughly 6 person-months for full parity excluding a from-scratch graphing engine.**
+Phase 1-2 alone yields a runnable Standard/Scientific Linux app much earlier and is a natural
+first milestone; Phases 3 and 5 are also independently shippable.
 
 ## Decisions
 
@@ -439,3 +454,8 @@ Standard/Scientific Linux app much earlier and is a natural first milestone.
 8. **UI verification (Phase 2):** headless `Avalonia.Headless` MSTest project
    (`tests/Calculator.Avalonia.Tests`) pressing real controls against the live engine —
    complementing the existing 294 VM tests and ctest engine suite.
+9. **Graphing engine (Phase 4):** the in-repo `src/GraphingImpl` is a mock and the proprietary
+   Microsoft engine is not available, so Phase 4 requires building or integrating a real engine
+   behind `GraphingInterfaces`; it is not a drop-in port. The graphing UI alone is portable.
+10. **Currency data:** ship the built-in mock rates (as the C++ engine does); a live feed is a
+    separate follow-up contingent on a maintained endpoint.
