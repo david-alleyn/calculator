@@ -243,6 +243,18 @@ namespace CalculatorApp.Avalonia.Views
 
         private void ToggleHistoryFlyout(object sender, RoutedEventArgs e)
         {
+            ToggleHistoryPanel();
+        }
+
+        // Ctrl+H equivalent: the docked pane is always visible when wide, so
+        // this toggles the full-width flyout (narrow windows).
+        public void ToggleHistoryPanel()
+        {
+            if (_docked)
+            {
+                return;
+            }
+
             if (HistoryPopup.IsOpen)
             {
                 CloseFlyouts();

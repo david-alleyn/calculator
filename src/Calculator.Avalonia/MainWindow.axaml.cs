@@ -12,6 +12,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
 using CalculatorApp.Avalonia.Common;
+using CalculatorApp.Avalonia.Views;
 using CalculatorApp.ViewModel;
 using CalculatorApp.ViewModel.Common;
 
@@ -101,7 +102,7 @@ namespace CalculatorApp.Avalonia
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (TryHandleModeShortcut(e.Key, e.KeyModifiers))
+            if (TryHandleShortcut(e.Key, e.KeyModifiers))
             {
                 e.Handled = true;
                 return;
@@ -114,9 +115,54 @@ namespace CalculatorApp.Avalonia
             }
         }
 
+        // Global accelerators: mode switching plus the UWP memory/history
+        // shortcuts.
+        public bool TryHandleShortcut(Key key, KeyModifiers modifiers)
+        {
+            return TryHandleModeShortcut(key, modifiers) || TryHandleCommandShortcut(key, modifiers);
+        }
+
+        // Ctrl+M store, Ctrl+L clear, Ctrl+R recall, Ctrl+P add, Ctrl+Q
+        // subtract, Ctrl+H history (mirrors the UWP shortcut set).
+        private bool TryHandleCommandShortcut(Key key, KeyModifiers modifiers)
+        {
+            if (!modifiers.HasFlag(KeyModifiers.Control)
+                || modifiers.HasFlag(KeyModifiers.Shift)
+                || modifiers.HasFlag(KeyModifiers.Alt))
+            {
+                return false;
+            }
+
+            StandardCalculatorViewModel calculator = ViewModel?.CalculatorViewModel;
+
+            switch (key)
+            {
+                case Key.H:
+                    (Main as MainView)?.ToggleHistoryPanel();
+                    return true;
+                case Key.M when calculator != null:
+                    calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Memory);
+                    return true;
+                case Key.L when calculator != null:
+                    calculator.ClearMemoryCommand.Execute(null);
+                    return true;
+                case Key.R when calculator != null:
+                    calculator.MemoryItemPressedCommand.Execute(0);
+                    return true;
+                case Key.P when calculator != null:
+                    calculator.MemoryAddCommand.Execute(0);
+                    return true;
+                case Key.Q when calculator != null:
+                    calculator.MemorySubtractCommand.Execute(0);
+                    return true;
+            }
+
+            return false;
+        }
+
         // Mode accelerators mirror the UWP access keys on the navigation items
         // (Alt/Ctrl+1 Standard, 2 Scientific, 4 Programmer, 5 Date).
-        public bool TryHandleModeShortcut(Key key, KeyModifiers modifiers)
+        private bool TryHandleModeShortcut(Key key, KeyModifiers modifiers)
         {
             if (!modifiers.HasFlag(KeyModifiers.Alt) && !modifiers.HasFlag(KeyModifiers.Control))
             {

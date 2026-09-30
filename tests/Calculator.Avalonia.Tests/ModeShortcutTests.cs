@@ -46,16 +46,16 @@ namespace Calculator.Avalonia.Tests
         {
             var (window, viewModel) = OpenCalculator();
 
-            Assert.IsTrue(window.TryHandleModeShortcut(Key.D2, KeyModifiers.Control));
+            Assert.IsTrue(window.TryHandleShortcut(Key.D2, KeyModifiers.Control));
             Assert.AreEqual(ViewMode.Scientific, viewModel.Mode);
 
-            Assert.IsTrue(window.TryHandleModeShortcut(Key.D4, KeyModifiers.Alt));
+            Assert.IsTrue(window.TryHandleShortcut(Key.D4, KeyModifiers.Alt));
             Assert.AreEqual(ViewMode.Programmer, viewModel.Mode);
 
-            Assert.IsTrue(window.TryHandleModeShortcut(Key.D5, KeyModifiers.Control));
+            Assert.IsTrue(window.TryHandleShortcut(Key.D5, KeyModifiers.Control));
             Assert.AreEqual(ViewMode.Date, viewModel.Mode);
 
-            Assert.IsTrue(window.TryHandleModeShortcut(Key.D1, KeyModifiers.Control));
+            Assert.IsTrue(window.TryHandleShortcut(Key.D1, KeyModifiers.Control));
             Assert.AreEqual(ViewMode.Standard, viewModel.Mode);
 
             Dispatcher.UIThread.Post(window.Close);
@@ -66,7 +66,7 @@ namespace Calculator.Avalonia.Tests
         {
             var (window, _) = OpenCalculator();
 
-            Assert.IsFalse(window.TryHandleModeShortcut(Key.D2, KeyModifiers.None));
+            Assert.IsFalse(window.TryHandleShortcut(Key.D2, KeyModifiers.None));
 
             Dispatcher.UIThread.Post(window.Close);
         }
@@ -77,8 +77,36 @@ namespace Calculator.Avalonia.Tests
             var (window, viewModel) = OpenCalculator();
 
             // Graphing (3) is not ported and therefore disabled in the nav.
-            Assert.IsFalse(window.TryHandleModeShortcut(Key.D3, KeyModifiers.Control));
+            Assert.IsFalse(window.TryHandleShortcut(Key.D3, KeyModifiers.Control));
             Assert.AreEqual(ViewMode.Standard, viewModel.Mode);
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void CommandShortcuts_ManageMemory()
+        {
+            var (window, viewModel) = OpenCalculator();
+            var calculator = viewModel.CalculatorViewModel;
+
+            calculator.ButtonPressedCommand.Execute(NumbersAndOperatorsEnum.Five);
+
+            Assert.IsTrue(window.TryHandleShortcut(Key.M, KeyModifiers.Control));
+            Assert.AreEqual(1, calculator.MemorizedNumbers.Count);
+            Assert.AreEqual("5", calculator.MemorizedNumbers[0].Value);
+
+            Assert.IsTrue(window.TryHandleShortcut(Key.L, KeyModifiers.Control));
+            Assert.AreEqual(0, calculator.MemorizedNumbers.Count);
+
+            Dispatcher.UIThread.Post(window.Close);
+        }
+
+        [TestMethod]
+        public void CommandShortcut_History_IsHandled()
+        {
+            var (window, _) = OpenCalculator();
+
+            Assert.IsTrue(window.TryHandleShortcut(Key.H, KeyModifiers.Control));
 
             Dispatcher.UIThread.Post(window.Close);
         }

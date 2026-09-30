@@ -103,6 +103,15 @@ namespace CalculatorApp.Avalonia.Views
             UpdateModeVisibility();
         }
 
+        // Ctrl+H support: only the calculator modes have a history pane.
+        public void ToggleHistoryPanel()
+        {
+            if (Calculator.IsVisible)
+            {
+                Calculator.ToggleHistoryPanel();
+            }
+        }
+
         // Date and Converter use different ViewModels and views, so the shell
         // swaps the content view instead of keypads within CalculatorView.
         private void UpdateModeVisibility()
