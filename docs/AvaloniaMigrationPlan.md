@@ -250,19 +250,28 @@ non-graphing mode.*
   `CalculatorScientificOperators.xaml`: the Trigonometry/Function flyout panel buttons (with the
   shift/hyp sub-grid switching), the main shift toggle that swaps the advanced function column
   between direct and inverse rows, pi/e, the operator column, and its own number pad.
-- `CalculatorView` overlays the Standard and Scientific keypads by mode
-  (`IsStandard`/`IsScientific`); the shell now enables the Scientific navigation item.
-- Verified: 13/13 Avalonia view tests (6 new Scientific tests: mode switching, π, arithmetic,
-  x², shift/inverse cube, and sin(30°)=0.5 through the flyout) plus a screenshot review.
+- Programmer mode is ported and navigable:
+  - `ProgrammerDisplayView` (port of `CalculatorProgrammerOperators` +
+    `CalculatorProgrammerDisplayPanel`): the HEX/DEC/OCT/BIN radix rows with live converted
+    values, the full-keypad/bit-flip toggle, and the cycling QWORD/DWORD/WORD/BYTE selector.
+  - `ProgrammerOperatorsView` (port of `CalculatorProgrammerRadixOperators`): the
+    Bitwise/Bit-shift panel-button flyouts, A-F hex digits, shift pairs per shift mode, and the
+    shared number pad.
+  - `ProgrammerBitFlipView` (port of `CalculatorProgrammerBitFlipPanel`): the 64 bit toggles
+    generated from `BinaryDigits`, with per-word-size enablement and the `BINPOS*` commands.
+- `CalculatorView` overlays the Standard/Scientific/Programmer keypads by mode; the shell now
+  enables the Scientific and Programmer navigation items.
+- Verified: 18/18 Avalonia view tests (Scientific: mode switching, π, arithmetic, x²,
+  shift/inverse cube, sin(30°)=0.5 via flyout; Programmer: panel switching, hex conversion,
+  bit-flip, word-size cycling, AND) plus screenshot reviews.
 
 **Remaining:**
-- Programmer mode (display panel, bit-flip panel, radix operators), Date calculation, and Unit
-  Converter (all categories + live currency).
+- Date calculation and Unit Converter (all categories + live currency).
 - Settings page, snapshots, keyboard shortcut parity.
 
 - Scientific (including Shift/inverse button collapse states) *Done.*
-- Programmer (bit-flip and radix panels), Date calculation, and Unit Converter (all categories
-  + live currency). *Pending.*
+- Programmer (bit-flip and radix panels) *Done.*
+- Date calculation and Unit Converter (all categories + live currency). *Pending.*
 - Settings page, snapshots, keyboard shortcut parity. *Pending.*
 
 **Exit criteria:** every non-graphing mode passes a manual parity checklist on Linux.

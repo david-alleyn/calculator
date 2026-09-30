@@ -71,8 +71,11 @@
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
 
-            <!-- Memory controls row -->
-            <Grid x:Name="MemoryPanel" Grid.Row="3" Margin="3,0">
+            <!-- Memory controls row (non-programmer modes) -->
+            <Grid x:Name="MemoryPanel"
+                  Grid.Row="3"
+                  Margin="3,0"
+                  IsVisible="{Binding IsProgrammer, Converter={StaticResource BooleanToVisibilityNegationConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" MaxWidth="80" />
                     <ColumnDefinition Width="1*" MaxWidth="80" />
@@ -132,7 +135,12 @@
                         Click="ToggleMemoryFlyout" />
             </Grid>
 
-            <!-- Number pad panel: standard or scientific operators + digit pad -->
+            <!-- Programmer display: radix rows + keypad toggle + word size -->
+            <v:ProgrammerDisplayView x:Name="ProgrammerDisplay"
+                                     Grid.Row="3"
+                                     IsVisible="{Binding IsProgrammer}" />
+
+            <!-- Number pad panel: standard/scientific/programmer operators -->
             <Grid x:Name="NumpadPanel" Grid.Row="4" Margin="3,0,3,3">
                 <Grid x:Name="StandardNumpad" IsVisible="{Binding IsStandard}">
                 <Grid.RowDefinitions>
@@ -246,6 +254,10 @@
                 </Grid>
 
                 <v:ScientificOperatorsView x:Name="ScientificOperators" IsVisible="{Binding IsScientific}" />
+
+                <v:ProgrammerOperatorsView x:Name="ProgrammerOperators" IsVisible="{Binding AreProgrammerRadixOperatorsVisible}" />
+
+                <v:ProgrammerBitFlipView x:Name="ProgrammerBitFlip" IsVisible="{Binding IsBinaryBitFlippingEnabled}" />
             </Grid>
         </Grid>
 

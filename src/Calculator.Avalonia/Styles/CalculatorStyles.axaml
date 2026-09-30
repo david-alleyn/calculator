@@ -325,6 +325,110 @@
         <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
     </Style>
 
+    <!-- Programmer radix rows (port of ProgModeRadioButtonStyle). -->
+    <Style Selector="RadioButton.RadixRow">
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RadioButton">
+                <Grid Background="Transparent">
+                    <Border x:Name="CheckedBar"
+                            Width="3"
+                            Margin="0,3"
+                            CornerRadius="2"
+                            HorizontalAlignment="Left"
+                            Background="{DynamicResource AccentButtonBackground}"
+                            IsVisible="False" />
+                    <ContentPresenter Margin="8,0,6,0"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="RadioButton.RadixRow:checked /template/ Border#CheckedBar">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Full keypad / bit flip toggle. -->
+    <Style Selector="RadioButton.KeypadModeToggle">
+        <Setter Property="FontFamily" Value="{StaticResource CalculatorFontFamily}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RadioButton">
+                <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Content}"
+                                      Foreground="{TemplateBinding Foreground}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="RadioButton.KeypadModeToggle:checked">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+    </Style>
+
+    <!-- Programmer word-size selector. -->
+    <Style Selector="Button.ProgWordSizeButton">
+        <Setter Property="MinWidth" Value="88" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorDefaultBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- Bit-flip toggles (port of FlippingToggleButtonStyle). -->
+    <Style Selector="ToggleButton.BitFlip">
+        <Setter Property="MinWidth" Value="12" />
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip:checked">
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector="ToggleButton.BitFlip:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource CalcButtonAltFillColorHoverBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.BitFlipLabel">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
     <!-- Docked panel tab headers (port of the pivot header used for History/Memory). -->
     <Style Selector="TabItem.DockPivotTabItem">
         <Setter Property="Height" Value="48" />

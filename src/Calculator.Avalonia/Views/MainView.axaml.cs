@@ -69,6 +69,7 @@ namespace CalculatorApp.Avalonia.Views
         {
             ViewMode.Standard,
             ViewMode.Scientific,
+            ViewMode.Programmer,
         };
 
         private void LimitSelectableModes()

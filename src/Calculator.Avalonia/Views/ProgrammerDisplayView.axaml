@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Programmer display panel (port of CalculatorProgrammerOperators.xaml +
+  CalculatorProgrammerDisplayPanel.xaml): the HEX/DEC/OCT/BIN radix rows,
+  the full-keypad/bit-flip toggle, and the word-size selector.
+  DataContext: StandardCalculatorViewModel.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:CalculatorApp.Avalonia.Controls"
+             x:Class="CalculatorApp.Avalonia.Views.ProgrammerDisplayView"
+             x:Name="ProgDisplayRoot"
+             Margin="3,0,0,0">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+        <!-- Radix rows -->
+        <RadioButton x:Name="HexButton"
+                     Grid.Row="0"
+                     Classes="RadixRow"
+                     GroupName="BaseConversion"
+                     Click="HexButton_Click">
+            <Grid ColumnDefinitions="48,*">
+                <TextBlock Text="HEX" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Grid.Column="1" Text="{Binding HexDisplayValue}" FontSize="16"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="NoWrap"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            </Grid>
+        </RadioButton>
+
+        <RadioButton x:Name="DecimalButton"
+                     Grid.Row="1"
+                     Classes="RadixRow"
+                     GroupName="BaseConversion"
+                     IsChecked="True"
+                     Click="DecimalButton_Click">
+            <Grid ColumnDefinitions="48,*">
+                <TextBlock Text="DEC" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Grid.Column="1" Text="{Binding DecimalDisplayValue}" FontSize="16"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="NoWrap"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            </Grid>
+        </RadioButton>
+
+        <RadioButton x:Name="OctButton"
+                     Grid.Row="2"
+                     Classes="RadixRow"
+                     GroupName="BaseConversion"
+                     Click="OctButton_Click">
+            <Grid ColumnDefinitions="48,*">
+                <TextBlock Text="OCT" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Grid.Column="1" Text="{Binding OctalDisplayValue}" FontSize="16"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="NoWrap"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            </Grid>
+        </RadioButton>
+
+        <RadioButton x:Name="BinaryButton"
+                     Grid.Row="3"
+                     Classes="RadixRow"
+                     GroupName="BaseConversion"
+                     Click="BinaryButton_Click">
+            <Grid ColumnDefinitions="48,*">
+                <TextBlock Text="BIN" FontSize="12" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Grid.Column="1" Text="{Binding BinaryDisplayValue}" FontSize="16"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="NoWrap"
+                           Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            </Grid>
+        </RadioButton>
+
+        <!-- Keypad toggle + word size -->
+        <Grid Grid.Row="4" Margin="0,4,4,0" ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <RadioButton x:Name="FullKeypadButton"
+                             GroupName="KeypadMode"
+                             Classes="KeypadModeToggle"
+                             Content="&#xe75f;"
+                             IsChecked="True"
+                             Click="FullKeypadButton_Click" />
+                <RadioButton x:Name="BitFlipButton"
+                             GroupName="KeypadMode"
+                             Classes="KeypadModeToggle"
+                             Content="&#xf7d0;"
+                             Click="BitFlipButton_Click" />
+            </StackPanel>
+
+            <Button x:Name="WordSizeButton"
+                    Grid.Column="2"
+                    Classes="ProgWordSizeButton"
+                    Content="QWORD"
+                    Click="WordSizeButton_Click" />
+        </Grid>
+    </Grid>
+</UserControl>
