@@ -56,7 +56,7 @@ namespace CalculatorApp.ViewModel.Common
 #if WINDOWS_UWP
                 return _resLoader?.GetString(id) ?? "";
 #else
-                return ReswResourceCatalog.GetString("CEngineStrings", id, "");
+                return ResxResourceCatalog.GetString("CEngineStrings", id, "");
 #endif
             }
             catch

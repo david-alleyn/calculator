@@ -2,22 +2,31 @@
 """resw -> resx converter for the Calculator localization pipeline.
 
 Reads each ``<locale>/*.resw`` pair under ``src/Calculator/Resources`` and emits
-a .NET ``.resx`` catalog (Microsoft ResX v2.0 schema) that ``ResourceManager``
-can load. Preserves the resource ``name`` key and its value; the resw ``<source>``
-comment (if present) is carried into the resx ``<comment>`` element.
+.NET ``.resx`` catalogs (Microsoft ResX v2.0 schema) that the SDK compiles into
+``ResourceManager`` resources / satellite assemblies. Preserves the resource
+``name`` key and its value; the resw ``<source>`` comment (if present) is carried
+into the resx ``<comment>`` element.
+
+Layouts:
+  flat    (default) SDK-friendly: en-US becomes the neutral ``Resources.resx`` /
+          ``CEngineStrings.resx`` and every other locale gets a culture suffix
+          (``Resources.fr-FR.resx``) so ``AssignCulture`` infers the culture.
+  locale  human-friendly: ``<out>/<locale>/Resources.resx`` per locale.
 
 Usage:
-    python3 Tools/resw2resx/resw2resx.py                        # all locales
-    python3 Tools/resw2resx/resw2resx.py --out build/lang/resx  # custom output
-    python3 Tools/resw2resx/resw2resx.py --locales en-US he-IL  # subset
-
-Output layout: ``<out>/<locale>/Resources.resx`` and ``<out>/<locale>/CEngineStrings.resx``.
+    python3 Tools/resw2resx/resw2resx.py                         # all locales, flat
+    python3 Tools/resw2resx/resw2resx.py --out build/lang/resx   # custom output
+    python3 Tools/resw2resx/resw2resx.py --layout locale         # per-locale dirs
+    python3 Tools/resw2resx/resw2resx.py --locales en-US he-IL   # subset
 """
 
 import argparse
 import os
 import sys
 import xml.etree.ElementTree as ET
+
+NEUTRAL_LOCALE = "en-US"
+CATALOG_NAMES = ("Resources", "CEngineStrings")
 
 RESOURCES_DIR = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src", "Calculator", "Resources")
@@ -70,28 +79,33 @@ def build_resx(entries):
 
 
 def serialize(root):
-    # Match the ResX serializer's casing; the default ElementTree serializer is
-    # functionally equivalent to System.Resources and round-trips correctly.
     ET.indent(root, space="  ")
     return ET.tostring(root, encoding="utf-8", xml_declaration=True)
 
 
-def convert_locale(locale, out_root):
+def convert_locale(locale, out_root, layout):
     src_dir = os.path.join(RESOURCES_DIR, locale)
     if not os.path.isdir(src_dir):
         print(f"  skip {locale} (missing source dir)", file=sys.stderr)
         return 0
 
     count = 0
-    for resw_name in ("Resources.resw", "CEngineStrings.resw"):
-        src = os.path.join(src_dir, resw_name)
+    for catalog in CATALOG_NAMES:
+        src = os.path.join(src_dir, catalog + ".resw")
         if not os.path.isfile(src):
             continue
-        entries = parse_resw(src)
-        resx_root = build_resx(entries)
-        out_dir = os.path.join(out_root, locale)
-        os.makedirs(out_dir, exist_ok=True)
-        out_path = os.path.join(out_dir, resw_name[:-len(".resw")] + ".resx")
+
+        resx_root = build_resx(parse_resw(src))
+
+        if layout == "flat":
+            os.makedirs(out_root, exist_ok=True)
+            file_name = catalog + ".resx" if locale == NEUTRAL_LOCALE else f"{catalog}.{locale}.resx"
+            out_path = os.path.join(out_root, file_name)
+        else:
+            out_dir = os.path.join(out_root, locale)
+            os.makedirs(out_dir, exist_ok=True)
+            out_path = os.path.join(out_dir, catalog + ".resx")
+
         with open(out_path, "wb") as fh:
             fh.write(serialize(resx_root))
         count += 1
@@ -110,6 +124,8 @@ def main():
     parser = argparse.ArgumentParser(description="Convert Calculator .resw catalogs to .resx.")
     parser.add_argument("--out", default=os.path.join("build", "lang", "resx"),
                         help="output root directory (default: build/lang/resx)")
+    parser.add_argument("--layout", choices=("flat", "locale"), default="flat",
+                        help="flat emits SDK culture-suffixed files; locale emits per-locale dirs")
     parser.add_argument("--locales", nargs="*",
                         help="locale(s) to convert (default: all)")
     args = parser.parse_args()
@@ -117,7 +133,7 @@ def main():
     locales = args.locales or find_locales()
     total = 0
     for locale in locales:
-        total += convert_locale(locale, os.path.normpath(args.out))
+        total += convert_locale(locale, os.path.normpath(args.out), args.layout)
 
     print(f"Converted {total} catalog(s) across {len(locales)} locale(s).")
     if total == 0:

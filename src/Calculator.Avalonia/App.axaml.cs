@@ -34,6 +34,24 @@ namespace CalculatorApp.Avalonia
                     break;
             }
 
+            // QA/user knob: CALCULATOR_UI_CULTURE=fr-FR pins the UI culture
+            // (useful when the host has no matching OS locale).
+            string uiCulture = Environment.GetEnvironmentVariable("CALCULATOR_UI_CULTURE");
+            if (!string.IsNullOrEmpty(uiCulture))
+            {
+                try
+                {
+                    var culture = new System.Globalization.CultureInfo(uiCulture);
+                    System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+                    System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+                    System.Globalization.CultureInfo.CurrentCulture = culture;
+                    System.Globalization.CultureInfo.CurrentUICulture = culture;
+                }
+                catch (System.Globalization.CultureNotFoundException)
+                {
+                }
+            }
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 // QA/automation knob: CALCULATOR_MODE=Standard|Scientific|... 

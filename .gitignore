@@ -8,6 +8,7 @@ build/cmake/
 
 # Generated resx catalogs (resw2resx localization pipeline output)
 build/lang/
+src/Calculator.ViewModels/Localization/
 CMakeUserPresets.json
 
 # User-specific files

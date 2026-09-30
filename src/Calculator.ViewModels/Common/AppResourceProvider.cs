@@ -37,8 +37,6 @@ namespace CalculatorApp.ViewModel.Common
             {
                 _cEngineStringResLoader = null;
             }
-#else
-            ReswResourceCatalog.EnsureLoaded();
 #endif
         }
 
@@ -49,7 +47,7 @@ namespace CalculatorApp.ViewModel.Common
 #if WINDOWS_UWP
             return _stringResLoader?.GetString(key) ?? key;
 #else
-            return ReswResourceCatalog.GetString(string.Empty, key, key);
+            return ResxResourceCatalog.GetString(string.Empty, key, key);
 #endif
         }
 
@@ -58,7 +56,7 @@ namespace CalculatorApp.ViewModel.Common
 #if WINDOWS_UWP
             return _cEngineStringResLoader?.GetString(key) ?? "";
 #else
-            return ReswResourceCatalog.GetString("CEngineStrings", key, "");
+            return ResxResourceCatalog.GetString("CEngineStrings", key, "");
 #endif
         }
     }

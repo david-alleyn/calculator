@@ -353,9 +353,16 @@ plotting equations with a minimal evaluator (no key-graph features).
   `calculator` launcher (`packaging/calculator-launcher.sh`) that resolves `CALCULATOR_NATIVE_LIB`
   and string catalogs from the install prefix.
 - Localization pipeline: `Tools/resw2resx/resw2resx.py` converts every locale's
-  `Resources.resw`/`CEngineStrings.resw` into `.resx` (ResX v2.0), emitting to
-  `build/lang/resx` (git-ignored). Verified: 120 catalogs across 60 locales, and the generated
-  output compiles cleanly through the SDK's `GenerateResource`/ResGen.
+  `Resources.resw`/`CEngineStrings.resw` into `.resx` (ResX v2.0). The Linux ViewModel project
+  runs it at build time (python3) into `src/Calculator.ViewModels/Localization/` (git-ignored,
+  flat SDK layout: en-US neutral, one culture-suffixed catalog per other locale) and embeds the
+  result, so each build ships the neutral resources plus 59 satellite assemblies.
+- Runtime resource loading is now `.resx`/`ResourceManager`: `ResxResourceCatalog` replaces the
+  transitional `.resw` parser, serving app and engine strings with the same fallback policy
+  (app strings fall back to the key, engine strings to `""`). Verified with neutral, satellite
+  (fr-FR), missing-satellite, and missing-key tests, plus a French-locale app run
+  ("Calcul de la date" / "Dates identiques"). The C++ shim still reads `CEngineStrings.resw`
+  for the engine's own string callback.
 
 **Packaging validation (real runs):**
 - Confirmed `org.freedesktop.Sdk.Extension.dotnet10` (10.0.8) is published for runtimes
@@ -378,15 +385,18 @@ plotting equations with a minimal evaluator (no key-graph features).
 **Remaining:**
 - Bump the manifest's pinned commit to a tagged release; RTL (Hebrew/Arabic) verification still
   needs a bilingual pass (the app does not yet set `FlowDirection` from locale).
-- Runtime switch from the transitional `.resw` loader to `.resx`/`ResourceManager` (tracked
-  separately from Phase 1 decision #4).
+- Several Avalonia views still hardcode UI strings (e.g. "Trigonometry", "Settings", the
+  Date/Converter labels); route them through `AppResourceProvider` next.
+- The generated `Localization/` folder requires a clean rebuild of dependents when it first
+  appears (satellites must land in the consumer's `.deps.json`); a full build always does this.
 
 - GitHub Actions on `ubuntu-latest`: engine CMake + ctest pipeline and `dotnet build/test`
   pipeline; keep existing Windows CI as long as the UWP app ships. *Done.*
 - Distribution: Flatpak manifest and Arch User Repository (AUR) packaging with desktop entry and
   icons; AppImage optional later. *Validated with real `makepkg` and `flatpak-builder` runs.*
 - Localization pipeline for the converted resx catalogs; RTL (Hebrew/Arabic) verification on
-  Linux. *Conversion tooling done; RTL verification pending.*
+  Linux. *Done: build-time conversion + runtime `ResourceManager` loading; RTL verification and
+  routing the remaining hardcoded view strings through the provider are pending.*
 
 ### Phase 6 - Cutover
 

@@ -13,7 +13,8 @@ license=('MIT')
 
 # Self-contained publish bundles the .NET runtime, so no dotnet runtime dep.
 depends=('glibc')
-makedepends=('git' 'dotnet-sdk' 'cmake' 'ninja' 'clang')
+# python is used at build time by the resw->resx localization step.
+makedepends=('git' 'dotnet-sdk' 'cmake' 'ninja' 'clang' 'python')
 
 source=("${pkgname}::git+${url}.git")
 sha256sums=('SKIP')
