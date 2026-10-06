@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Date calculation view (port of DateCalculator.xaml). Supports the
+  date-difference and add/subtract flows. DataContext: DateCalculatorViewModel.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CalculatorApp.Avalonia.Converters"
+             x:Class="CalculatorApp.Avalonia.Views.DateCalculatorView"
+             x:Name="DateRoot">
+
+    <UserControl.Resources>
+        <conv:ReswStringConverter x:Key="ReswStringConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <conv:BooleanToVisibilityNegationConverter x:Key="BooleanToVisibilityNegationConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="12,8" RowDefinitions="Auto,Auto,*">
+        <!-- Mode selector -->
+        <ComboBox x:Name="DateCalculationOption"
+                  Grid.Row="0"
+                  MinWidth="276"
+                  HorizontalAlignment="Left"
+                  SelectedIndex="0"
+                  SelectionChanged="DateCalculationOption_SelectionChanged">
+            <ComboBoxItem Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=Date_DifferenceOption.Content}" />
+            <ComboBoxItem Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=Date_AddSubtractOption.Content}" />
+        </ComboBox>
+
+        <!-- Difference between two dates -->
+        <Grid x:Name="DateDiffGrid"
+              Grid.Row="1"
+              Margin="0,8,0,0"
+              IsVisible="{Binding IsDateDiffMode}"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+            <StackPanel Grid.Row="0" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DateDiff_FromHeader.Header}" FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <CalendarDatePicker x:Name="DateDiff_FromDate"
+                                    MinWidth="240"
+                                    Margin="0,4,0,0"
+                                    SelectedDateChanged="FromDate_SelectedDateChanged" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Margin="0,8,0,0" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DateDiff_ToHeader.Header}" FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <CalendarDatePicker x:Name="DateDiff_ToDate"
+                                    MinWidth="240"
+                                    Margin="0,4,0,0"
+                                    SelectedDateChanged="ToDate_SelectedDateChanged" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="2"
+                       Margin="0,12,0,0"
+                       FontSize="12"
+                       Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=Date_DifferenceLabel.Text}"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <TextBlock x:Name="DateDiffAllUnitsResultLabel"
+                       Grid.Row="3"
+                       Margin="0,4,0,0"
+                       FontSize="20"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       Text="{Binding StrDateDiffResult}" />
+            <TextBlock Grid.Row="4"
+                       Margin="0,6,0,0"
+                       FontSize="14"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       Text="{Binding StrDateDiffResultInDays}"
+                       IsVisible="{Binding IsDiffInDays, Converter={StaticResource BooleanToVisibilityNegationConverter}}" />
+        </Grid>
+
+        <!-- Add or subtract -->
+        <Grid x:Name="AddSubtractDateGrid"
+              Grid.Row="1"
+              Margin="0,8,0,0"
+              IsVisible="{Binding IsDateDiffMode, Converter={StaticResource BooleanToVisibilityNegationConverter}}"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+            <StackPanel Grid.Row="0" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=AddSubtract_Date_FromHeader.Header}" FontSize="12"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                <CalendarDatePicker x:Name="AddSubtract_FromDate"
+                                    MinWidth="240"
+                                    Margin="0,4,0,0"
+                                    SelectedDateChanged="StartDate_SelectedDateChanged" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="0,12,0,0" Orientation="Horizontal" Spacing="20">
+                <RadioButton x:Name="AddOption" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=AddOption.Content}" Click="AddOption_Click" />
+                <RadioButton x:Name="SubtractOption" Content="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=SubtractOption.Content}" Click="SubtractOption_Click" />
+            </StackPanel>
+
+            <Grid Grid.Row="2" Margin="0,12,0,0" ColumnDefinitions="Auto,Auto,Auto">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=YearsLabel.Text}" FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                    <ComboBox x:Name="YearsValue"
+                              MinWidth="84"
+                              Margin="0,4,0,0"
+                              ItemsSource="{Binding OffsetValues}"
+                              SelectedIndex="{Binding YearsOffset, Mode=TwoWay}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="12,0">
+                    <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=MonthsLabel.Text}" FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                    <ComboBox x:Name="MonthsValue"
+                              MinWidth="84"
+                              Margin="0,4,0,0"
+                              ItemsSource="{Binding OffsetValues}"
+                              SelectedIndex="{Binding MonthsOffset, Mode=TwoWay}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DaysLabel.Text}" FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                    <ComboBox x:Name="DaysValue"
+                              MinWidth="84"
+                              Margin="0,4,0,0"
+                              ItemsSource="{Binding OffsetValues}"
+                              SelectedIndex="{Binding DaysOffset, Mode=TwoWay}" />
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Grid.Row="3"
+                       Margin="0,12,0,0"
+                       FontSize="12"
+                       Text="{Binding Converter={StaticResource ReswStringConverter}, ConverterParameter=DateLabel.Text}"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <TextBlock x:Name="DateResultLabel"
+                       Grid.Row="4"
+                       Margin="0,4,0,0"
+                       FontSize="20"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                       Text="{Binding StrDateResult}" />
+        </Grid>
+    </Grid>
+</UserControl>

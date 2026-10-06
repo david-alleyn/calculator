@@ -5,9 +5,32 @@
 
 #include <vector>
 #include <unordered_map>
-#include <ppltasks.h>
 #include "sal_cross_platform.h" // for SAL
 #include <memory>               // for std::shared_ptr
+
+#if defined(_WIN32)
+#include <ppltasks.h>
+#else
+
+// Minimal concurrency::task stub so the UnitConverter declarations compile
+// on Linux. The converter itself is not part of the Phase 0 engine build.
+namespace concurrency
+{
+    template <typename T>
+    class task
+    {
+    public:
+        task() = default;
+        task(task const&) = delete;
+        task(task&&) = default;
+        T get() const
+        {
+            return T{};
+        }
+    };
+}
+
+#endif
 
 namespace UnitConversionManager
 {

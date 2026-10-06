@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Programmer bit-flip panel (port of CalculatorProgrammerBitFlipPanel.xaml).
+  The 64 bit toggles are generated in code-behind from the ViewModel's
+  BinaryDigits. DataContext: StandardCalculatorViewModel.
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalculatorApp.Avalonia.Views.ProgrammerBitFlipView"
+             x:Name="BitFlipRoot"
+             Margin="3,0,3,3">
+
+    <Grid x:Name="BitFlipGrid" />
+</UserControl>

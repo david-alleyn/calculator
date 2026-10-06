@@ -5,13 +5,18 @@
 #include "EngineResourceProvider.h"
 
 using namespace CalculatorApp::ViewModel::Common;
-using namespace Platform;
-using namespace Windows::ApplicationModel::Resources;
 using namespace std;
 
+#if defined(_WIN32)
+using namespace Platform;
+using namespace Windows::ApplicationModel::Resources;
+#endif
+
 EngineResourceProvider::EngineResourceProvider()
+#if defined(_WIN32)
+    : m_resLoader(ResourceLoader::GetForViewIndependentUse(L"CEngineStrings"))
+#endif
 {
-    m_resLoader = ResourceLoader::GetForViewIndependentUse("CEngineStrings");
 }
 
 wstring EngineResourceProvider::GetCEngineString(wstring_view id)
@@ -34,7 +39,13 @@ wstring EngineResourceProvider::GetCEngineString(wstring_view id)
         return L"3;0";
     }
 
-    StringReference idRef(id.data(), id.length());
-    String ^ str = m_resLoader->GetString(idRef);
-    return wstring(str->Data());
+#if defined(_WIN32)
+    wstring str{ m_resLoader.GetString(wstring(id)) };
+    return str;
+#else
+    // Non-Windows fallback: the numeric engine-string table (operator glyphs,
+    // error strings, ...) is not available on Linux yet; return the raw id so
+    // callers can rely on a non-empty value.
+    return wstring(id);
+#endif
 }

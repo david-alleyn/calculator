@@ -3,6 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# CMake build trees (Linux port)
+build/cmake/
+
+# Generated resx catalogs (resw2resx localization pipeline output)
+build/lang/
+src/Calculator.ViewModels/Localization/
+CMakeUserPresets.json
+
 # User-specific files
 *.suo
 *.user

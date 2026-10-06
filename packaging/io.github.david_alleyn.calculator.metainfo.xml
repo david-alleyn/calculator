@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- AppStream metadata for the Linux Calculator (Avalonia). -->
+<component type="desktop-application">
+  <id>io.github.david_alleyn.calculator</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Calculator</name>
+  <summary>Windows Calculator, ported to Linux</summary>
+
+  <description>
+    <p>
+      A port of the Windows Calculator to Linux, built with Avalonia. Provides a
+      Standard calculator with a familiar layout, history, and memory, driven by
+      the original arbitrary-precision calculation engine.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.david_alleyn.calculator.desktop</launchable>
+
+  <url type="homepage">https://github.com/david-alleyn/calculator</url>
+  <url type="bugtracker">https://github.com/david-alleyn/calculator/issues</url>
+
+  <releases>
+    <release version="0.0.1" date="2026-09-04">
+      <description>
+        <p>Initial Linux release with the Standard calculator mode.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1" />
+</component>

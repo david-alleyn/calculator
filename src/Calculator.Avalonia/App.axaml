@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CalculatorApp.Avalonia.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Styles>
+        <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentTheme.xaml" />
+        <StyleInclude Source="avares://Calculator.Avalonia/Styles/CalculatorStyles.axaml" />
+    </Application.Styles>
+
+    <Application.Resources>
+        <FontFamily x:Key="CalculatorFontFamily">avares://Calculator.Avalonia/Assets/CalculatorIcons.ttf#Calculator Fluent Icons</FontFamily>
+        <SolidColorBrush x:Key="AppWindowBackgroundLightBrush" Color="#FFF3F3F3" />
+        <SolidColorBrush x:Key="AppWindowBackgroundDarkBrush" Color="#FF202020" />
+    </Application.Resources>
+
+</Application>

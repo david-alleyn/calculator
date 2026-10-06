@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using CalcManager.Interop;
-using Windows.Storage.Streams;
 
 namespace CalculatorApp.ViewModel.Common
 {
@@ -68,16 +68,16 @@ namespace CalculatorApp.ViewModel.Common
     }
 
     /// <summary>
-    /// Deserializes expression commands from a DataReader.
+    /// Deserializes expression commands from a managed binary reader.
     /// This is the C# port of the C++ CommandDeserializer.
     /// </summary>
     public class ExpressionCommandDeserializer
     {
-        private readonly DataReader _dataReader;
+        private readonly BinaryReader _reader;
 
-        public ExpressionCommandDeserializer(DataReader dataReader)
+        public ExpressionCommandDeserializer(BinaryReader reader)
         {
-            _dataReader = dataReader;
+            _reader = reader;
         }
 
         public object Deserialize(CommandType cmdType)
@@ -99,15 +99,15 @@ namespace CalculatorApp.ViewModel.Common
 
         private DeserializedOperand DeserializeOperand()
         {
-            bool isNegative = _dataReader.ReadBoolean();
-            bool isDecimal = _dataReader.ReadBoolean();
-            bool isSciFmt = _dataReader.ReadBoolean();
+            bool isNegative = _reader.ReadBoolean();
+            bool isDecimal = _reader.ReadBoolean();
+            bool isSciFmt = _reader.ReadBoolean();
 
             var commands = new List<int>();
-            uint cmdVectorSize = _dataReader.ReadUInt32();
+            uint cmdVectorSize = _reader.ReadUInt32();
             for (uint j = 0; j < cmdVectorSize; j++)
             {
-                commands.Add(_dataReader.ReadInt32());
+                commands.Add(_reader.ReadInt32());
             }
 
             return new DeserializedOperand(isNegative, isDecimal, isSciFmt, commands);
@@ -115,24 +115,24 @@ namespace CalculatorApp.ViewModel.Common
 
         private DeserializedParentheses DeserializeParentheses()
         {
-            int cmd = _dataReader.ReadInt32();
+            int cmd = _reader.ReadInt32();
             return new DeserializedParentheses(cmd);
         }
 
         private DeserializedUnary DeserializeUnary()
         {
-            uint cmdSize = _dataReader.ReadUInt32();
+            uint cmdSize = _reader.ReadUInt32();
             var commands = new List<int>();
             for (uint i = 0; i < cmdSize; i++)
             {
-                commands.Add(_dataReader.ReadInt32());
+                commands.Add(_reader.ReadInt32());
             }
             return new DeserializedUnary(commands);
         }
 
         private DeserializedBinary DeserializeBinary()
         {
-            int cmd = _dataReader.ReadInt32();
+            int cmd = _reader.ReadInt32();
             return new DeserializedBinary(cmd);
         }
     }
